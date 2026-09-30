@@ -58,6 +58,20 @@ The system provides event organizers with tools to track guest attendance, manag
 - **Session Analytics**: Popularity and duration of sessions
 - **Export Capabilities**: Support for multiple export formats (CSV, JSON, Excel, PDF)
 
+### 6. Natural Language Query Interface (LLM-Powered)
+- **Plain English Queries**: Master users and volunteers can ask questions in natural language
+- **LLM Integration**: Uses Large Language Models to interpret and execute queries
+- **Query Examples**: 
+  - "How many users are currently in the venue?"
+  - "Show me all doctors by profession"
+  - "Find users with name containing 'John'"
+  - "List all VIP guests who haven't checked in yet"
+  - "Show attendees from company 'Tech Corp'"
+  - "How many guests have dietary restrictions?"
+- **Intelligent Response**: LLM generates human-readable answers with supporting data
+- **Query History**: All natural language queries and responses are logged
+- **Access Control**: Only master users and approved volunteers can use this feature
+
 ## Data Models
 
 ### User Authentication
@@ -135,13 +149,22 @@ The system provides event organizers with tools to track guest attendance, manag
 1. **Types Module**: Defines all data structures and types used throughout the system
 2. **Database Module**: Handles data storage and retrieval (initially in-memory, extensible to persistent storage)
 3. **API Module**: Provides business logic and application programming interface
-4. **Application Module**: Main application logic and user interface integration points
+4. **LLM Query Module**: Processes natural language queries using Large Language Models
+5. **Application Module**: Main application logic and user interface integration points
 
 ### Storage Strategy
 - Initial implementation uses in-memory storage for demonstration
 - Designed for easy migration to persistent database systems
 - Supports concurrent access patterns
 - Maintains data consistency across operations
+
+### LLM Query Strategy
+- **Model Integration**: Connects to Large Language Models (OpenAI GPT, Claude, etc.)
+- **Query Parsing**: Natural language queries are parsed into structured database queries
+- **Response Generation**: LLM generates human-readable responses with data context
+- **Query Validation**: Ensures queries only access permitted data based on user role
+- **Caching**: Frequently asked queries are cached for performance
+- **Learning**: System learns from query patterns to improve response accuracy
 
 ### First-time Setup Strategy
 - System detects empty database on first launch
@@ -228,6 +251,17 @@ The system provides event organizers with tools to track guest attendance, manag
 3. Data can be viewed in dashboard or exported
 4. Historical data available for trend analysis
 
+### Natural Language Query Workflow (LLM-Powered)
+1. Master user or approved volunteer accesses query interface
+2. User enters question in plain English (e.g., "How many doctors are in the venue?")
+3. System sends query to LLM for interpretation
+4. LLM analyzes query intent and converts to structured database query
+5. System executes database query with appropriate access controls
+6. Results are sent back to LLM for response generation
+7. LLM creates human-readable answer with supporting data
+8. Response displayed to user with option to export or save
+9. Query and response logged for audit and learning purposes
+
 ## System Requirements
 
 ### Functional Requirements
@@ -239,25 +273,33 @@ The system provides event organizers with tools to track guest attendance, manag
 6. **Guest Registration**: Only master users and approved volunteers can register guests (no guest self-registration)
 7. **Mandatory Volunteer Assistance**: Guests must be checked in and checked out by volunteers (no self-service)
 8. **Volunteer Tracking**: All check-ins and check-outs must record the assisting volunteer
-9. **Support registration of unlimited guests**
-10. **Handle concurrent check-ins/check-outs**
-11. **Provide real-time attendance statistics**
-12. **Generate comprehensive reports**
-13. **Support multiple event sessions**
-14. **Track guest categories and special requirements**
-15. **Export data in standard formats**
+9. **Natural Language Queries**: Master users and volunteers can ask questions in plain English using LLM
+10. **LLM Integration**: Connect to Large Language Models for query interpretation and response generation
+11. **Query Examples**: Support for queries like "How many users in venue?", "Find doctors by profession", "Search by name or characteristics"
+12. **Support registration of unlimited guests**
+13. **Handle concurrent check-ins/check-outs**
+14. **Provide real-time attendance statistics**
+15. **Generate comprehensive reports**
+16. **Support multiple event sessions**
+17. **Track guest categories and special requirements**
+18. **Export data in standard formats**
 
 ### Non-Functional Requirements
 1. **Security**: Secure OTP generation and validation, session management
 2. **Phone Number Integrity**: Strict validation of phone number format
-3. **Responsive user interface for staff use**
-4. **Scalable architecture for large events**
-5. **Data integrity and consistency**
-6. **Privacy protection for all user information**
-7. **System availability during event hours**
-8. **Performance under peak load conditions**
-9. **Audit Trail**: Track all user actions including registrations and approvals
-10. **Backup & Recovery**: Regular data backup with recovery procedures
+3. **LLM Security**: Secure API integration with language models, data privacy protection
+4. **Query Performance**: Fast response times for natural language queries (< 3 seconds)
+5. **Responsive user interface for staff use**
+6. **Scalable architecture for large events**
+7. **Data integrity and consistency**
+8. **Privacy protection for all user information**
+9. **System availability during event hours**
+10. **Performance under peak load conditions**
+11. **Audit Trail**: Track all user actions including registrations, approvals, and queries
+12. **Backup & Recovery**: Regular data backup with recovery procedures
+13. **LLM Accuracy**: High accuracy in query interpretation and response generation
+14. **Query Caching**: Efficient caching of frequent queries to reduce LLM API calls
+15. **Rate Limiting**: Prevent abuse of LLM query functionality
 
 ## Security Considerations
 - **Multi-factor Authentication**: OTP-based login via email or phone
@@ -420,3 +462,156 @@ The system operates on a **mandatory volunteer-assisted model** where guests can
 3. **Station Design**: Physical check-in/check-out stations manned by volunteers
 4. **Backup Procedures**: Contingency plans for volunteer shortages
 5. **Audit Trail**: Comprehensive logging of all volunteer-assisted operations
+
+
+## Integration Points
+
+### LLM Service Integrations
+- **OpenAI GPT Models**: For natural language query interpretation and response generation
+- **Claude API**: Alternative LLM provider for query processing
+- **Local LLMs**: Option to run models locally for data privacy (Llama, Mistral, etc.)
+- **Vector Databases**: For semantic search and query understanding (Pinecone, Weaviate, etc.)
+
+### Authentication & Communication Services
+- **Email Service Providers**: For OTP delivery and notifications
+- **SMS Gateways**: For phone-based OTP delivery (requires country code support)
+- **International Phone Validation Services**: For country code and number format validation
+
+### Event Management Systems
+- **Ticketing system integration** (optional)
+- **Payment processing systems** (optional)
+- **Badge printing systems**
+- **Mobile app connectivity**
+- **Third-party analytics tools**
+
+### Data Storage & Processing
+- **Database Systems**: PostgreSQL, MongoDB, or similar for persistent storage
+- **Cache Systems**: Redis or similar for query caching and session management
+- **File Storage**: For document storage and export files
+- **Backup Services**: Automated backup solutions
+
+## Natural Language Query System (LLM-Powered)
+
+### Architecture Overview
+The natural language query system uses a multi-layer architecture:
+
+1. **Query Interface**: Users enter questions in plain English
+2. **LLM Gateway**: Routes queries to appropriate language models
+3. **Query Parser**: Converts natural language to structured queries
+4. **Data Access Layer**: Executes queries with proper access controls
+5. **Response Generator**: Creates human-readable answers with data
+6. **Query Logger**: Records all queries and responses for audit
+
+### Supported Query Types
+
+#### 1. Attendance Queries
+- "How many users are currently in the venue?"
+- "Show me total attendance for today"
+- "How many guests checked in during the last hour?"
+- "What's the peak attendance time so far?"
+
+#### 2. Demographic Queries
+- "How many doctors by profession are attending?"
+- "List all engineers from Tech Corp"
+- "Show me guests with dietary restrictions"
+- "Find VIP guests who haven't arrived yet"
+
+#### 3. Search Queries
+- "Find user with name containing 'John'"
+- "Search for guests from company 'Microsoft'"
+- "Show me all speakers for today's event"
+- "Find volunteers with medical training"
+
+#### 4. Analytical Queries
+- "What percentage of registered guests have checked in?"
+- "Show attendance breakdown by guest category"
+- "Which session has the highest attendance?"
+- "What's the average check-in time for VIP guests?"
+
+### LLM Integration Details
+
+#### Model Configuration
+- **Primary Model**: GPT-4 or equivalent for best accuracy
+- **Fallback Model**: GPT-3.5 or Claude for cost optimization
+- **Local Option**: Llama 2/3 or Mistral for data privacy requirements
+- **Model Switching**: Automatic fallback if primary model fails
+
+#### Query Processing Flow
+1. **Input Sanitization**: Remove sensitive data before sending to LLM
+2. **Intent Recognition**: LLM identifies query type and intent
+3. **Query Translation**: Convert to structured database query (SQL, etc.)
+4. **Access Control**: Apply role-based permissions to query
+5. **Execution**: Run query against database
+6. **Response Formatting**: LLM formats results into natural language
+7. **Enhancement**: Add insights, trends, or recommendations
+
+#### Security & Privacy
+- **Data Anonymization**: Personally identifiable information is masked
+- **Query Logging**: All queries logged with user and timestamp
+- **Access Controls**: Queries limited to user's permission level
+- **Rate Limiting**: Prevent excessive LLM API usage
+- **Data Minimization**: Only necessary data sent to LLM APIs
+
+#### Performance Optimization
+- **Query Caching**: Frequently asked questions cached locally
+- **Response Caching**: Common responses stored for fast retrieval
+- **Batch Processing**: Multiple similar queries processed together
+- **Async Processing**: Long-running queries processed in background
+
+### User Experience
+
+#### Query Interface Design
+- **Chat-like Interface**: Natural conversation flow
+- **Query Suggestions**: Common questions suggested to users
+- **Query History**: Previous queries easily accessible
+- **Save Results**: Option to save or export query results
+- **Follow-up Questions**: Context maintained for conversation
+
+#### Response Presentation
+- **Human-readable Answers**: Natural language responses
+- **Data Visualization**: Charts and graphs for quantitative data
+- **Supporting Details**: Expandable sections with raw data
+- **Actionable Insights**: Recommendations based on query results
+- **Export Options**: CSV, PDF, or image export of results
+
+### Implementation Considerations
+
+#### Technical Requirements
+- **LLM API Keys**: Secure storage and rotation of API credentials
+- **Rate Limit Management**: Respect LLM provider limits
+- **Error Handling**: Graceful degradation if LLM service unavailable
+- **Cost Management**: Monitoring and optimization of LLM usage costs
+- **Model Updates**: Regular updates to use latest model versions
+
+#### Training & Fine-tuning
+- **Domain-specific Training**: Fine-tune models on event management terminology
+- **Query Pattern Learning**: System learns from user query patterns
+- **Feedback Loop**: Users can rate query responses for improvement
+- **Continuous Learning**: Model improves over time with more usage
+
+#### Compliance & Governance
+- **Audit Trail**: Complete logging of all LLM interactions
+- **Data Privacy**: Compliance with GDPR, CCPA, and other regulations
+- **Ethical AI**: Monitoring for bias in query responses
+- **Transparency**: Users informed when LLM is being used
+- **Consent Management**: Optional opt-out for LLM features
+
+### Success Metrics
+
+#### Performance Metrics
+- **Query Accuracy**: Percentage of correctly interpreted queries
+- **Response Time**: Average time from query to response
+- **User Satisfaction**: Ratings and feedback on query responses
+- **LLM Cost Efficiency**: Cost per query optimization
+
+#### Usage Metrics
+- **Query Volume**: Number of natural language queries per day
+- **User Adoption**: Percentage of users utilizing query feature
+- **Query Complexity**: Distribution of simple vs. complex queries
+- **Feature Usage**: Which query types are most popular
+
+#### Business Impact
+- **Time Saved**: Reduction in manual report generation time
+- **Decision Quality**: Improved decisions based on query insights
+- **User Productivity**: Increased efficiency for master users and volunteers
+- **Event Insights**: Better understanding of event dynamics and attendee behavior
