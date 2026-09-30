@@ -1,0 +1,437 @@
+# Workspace Settings  
+# Central configuration for all workspace-level agent behaviour.  
+# Read by agents that support it; $ARGUMENTS passed to an agent always take precedence.
+
+# ============================================================================
+# PROJECT IDENTIFICATION
+# ============================================================================
+
+project:
+  name: "Event Entry Guest Tracker"
+  version: "1.0.0"
+  description: "Comprehensive event management system with mandatory volunteer assistance and LLM-powered natural language queries"
+  repository: "https://github.com/himanshu-iit/aws-hackathon"
+  owner: "himanshu-iit"
+  contact: "guptahim@msn.com"
+
+# ============================================================================
+# AGENT BEHAVIOR CONFIGURATION
+# ============================================================================
+
+agent:
+  
+  # --------------------------------------------------------------------------
+  # GENERAL BEHAVIOR
+  # --------------------------------------------------------------------------
+  general:
+    autopilot_mode: true
+    supervised_mode: false
+    max_concurrent_tasks: 3
+    task_timeout_minutes: 30
+    require_confirmation_for:
+      - destructive_operations
+      - production_deployments
+      - security_changes
+      - database_migrations
+  
+  # --------------------------------------------------------------------------
+  # CODE QUALITY & STANDARDS
+  # --------------------------------------------------------------------------
+  code_quality:
+    enforce_code_style: true
+    language: "typescript"  # Primary implementation language
+    test_coverage_target: 80
+    lint_on_save: true
+    format_on_save: true
+    documentation_required: true
+    
+    standards:
+      - "Follow TypeScript best practices"
+      - "Use async/await for asynchronous operations"
+      - "Implement proper error handling"
+      - "Add JSDoc comments for public APIs"
+      - "Write unit tests for critical functions"
+  
+  # --------------------------------------------------------------------------
+  # SECURITY & COMPLIANCE
+  # --------------------------------------------------------------------------
+  security:
+    data_privacy:
+      encrypt_sensitive_data: true
+      mask_pii_in_logs: true
+      retention_period_days: 30
+      
+    authentication:
+      require_mfa: true
+      session_timeout_minutes: 60
+      max_login_attempts: 5
+      
+    api_security:
+      rate_limiting_enabled: true
+      cors_origins: ["https://*.example.com"]
+      https_required: true
+  
+  # --------------------------------------------------------------------------
+  # DEVELOPMENT WORKFLOW
+  # --------------------------------------------------------------------------
+  workflow:
+    git:
+      branch_naming: "feature/descriptive-name"
+      commit_message_format: "conventional"
+      require_pull_requests: true
+      protected_branches: ["main", "master"]
+      
+    testing:
+      run_tests_on_push: true
+      automated_test_suite: true
+      coverage_reports: true
+      
+    deployment:
+      staging_environment: true
+      production_approval_required: true
+      rollback_strategy: "automated"
+
+# ============================================================================
+# PROJECT-SPECIFIC CONFIGURATION
+# ============================================================================
+
+project_specific:
+  
+  # --------------------------------------------------------------------------
+  # EVENT MANAGEMENT CONFIGURATION
+  # --------------------------------------------------------------------------
+  event_management:
+    max_guests_per_event: 10000
+    max_volunteers_per_event: 200
+    checkin_timeout_minutes: 5
+    session_duration_default_minutes: 60
+    
+    categories:
+      - "General Attendee"
+      - "VIP"
+      - "Speaker"
+      - "Staff"
+      - "Volunteer"
+      - "Press"
+      - "Sponsor"
+      - "Custom"
+    
+    dietary_restrictions:
+      - "None"
+      - "Vegetarian"
+      - "Vegan"
+      - "Gluten Free"
+      - "Dairy Free"
+      - "Nut Allergy"
+      - "Other"
+  
+  # --------------------------------------------------------------------------
+  # AUTHENTICATION CONFIGURATION
+  # --------------------------------------------------------------------------
+  authentication:
+    phone_number_format: "+[country_code][10_digits]"
+    otp_expiry_minutes: 10
+    otp_length: 6
+    allowed_country_codes: ["91", "1", "44", "61", "81"]
+    
+    user_roles:
+      master_user:
+        permissions:
+          - "system_configuration"
+          - "volunteer_approval"
+          - "guest_registration"
+          - "query_execution"
+          - "report_generation"
+          - "data_export"
+          
+      volunteer:
+        permissions:
+          - "guest_registration"
+          - "checkin_checkout"
+          - "basic_queries"
+          - "view_attendance"
+          
+      guest:
+        permissions: []
+        # No direct system access - all actions mediated by volunteers
+  
+  # --------------------------------------------------------------------------
+  # LLM QUERY SYSTEM CONFIGURATION
+  # --------------------------------------------------------------------------
+  llm_query_system:
+    enabled: true
+    primary_provider: "openai"
+    fallback_provider: "anthropic"
+    local_model_option: true
+    
+    providers:
+      openai:
+        model: "gpt-4"
+        temperature: 0.3
+        max_tokens: 1000
+        
+      anthropic:
+        model: "claude-3-opus"
+        temperature: 0.2
+        max_tokens: 1000
+        
+      local:
+        model: "llama-3-8b"
+        temperature: 0.5
+        max_tokens: 800
+    
+    query_processing:
+      cache_enabled: true
+      cache_ttl_minutes: 60
+      max_query_length: 500
+      response_time_target_seconds: 3
+      
+    security:
+      anonymize_pii: true
+      log_all_queries: true
+      query_rate_limit_per_user: 100
+      query_rate_limit_per_hour: 1000
+  
+  # --------------------------------------------------------------------------
+  # DATABASE CONFIGURATION
+  # --------------------------------------------------------------------------
+  database:
+    primary: "postgresql"
+    backup: "mongodb"
+    
+    postgresql:
+      connection_pool: 20
+      migration_automation: true
+      backup_frequency: "daily"
+      
+    mongodb:
+      use_for: ["session_store", "query_cache", "audit_logs"]
+      ttl_indexes: true
+    
+    redis:
+      use_for: ["session_cache", "rate_limiting", "real_time_updates"]
+      default_ttl_seconds: 3600
+
+# ============================================================================
+# INTEGRATION CONFIGURATION
+# ============================================================================
+
+integrations:
+  
+  # --------------------------------------------------------------------------
+  # EXTERNAL SERVICES
+  # --------------------------------------------------------------------------
+  external_services:
+    sms_provider:
+      primary: "twilio"
+      fallback: "aws_sns"
+      
+    email_provider:
+      primary: "sendgrid"
+      fallback: "aws_ses"
+      
+    llm_apis:
+      openai:
+        api_key_env_var: "OPENAI_API_KEY"
+        base_url: "https://api.openai.com/v1"
+        
+      anthropic:
+        api_key_env_var: "ANTHROPIC_API_KEY"
+        base_url: "https://api.anthropic.com/v1"
+  
+  # --------------------------------------------------------------------------
+  # THIRD-PARTY INTEGRATIONS
+  # --------------------------------------------------------------------------
+  third_party:
+    ticketing_systems:
+      - "eventbrite"
+      - "ticketmaster"
+      - "custom"
+      
+    payment_processors:
+      - "stripe"
+      - "paypal"
+      
+    analytics_tools:
+      - "google_analytics"
+      - "mixpanel"
+      - "custom_dashboards"
+
+# ============================================================================
+# MONITORING & LOGGING
+# ============================================================================
+
+monitoring:
+  logging:
+    level: "info"
+    format: "json"
+    retention_days: 90
+    
+    destinations:
+      - "console"
+      - "file"
+      - "elasticsearch"
+  
+  metrics:
+    collection_interval_seconds: 60
+    destinations:
+      - "prometheus"
+      - "datadog"
+    
+    key_metrics:
+      - "checkin_latency"
+      - "query_response_time"
+      - "system_uptime"
+      - "user_sessions"
+      - "llm_api_calls"
+  
+  alerts:
+    enabled: true
+    channels:
+      - "email"
+      - "slack"
+      - "sms"
+    
+    conditions:
+      - "system_down"
+      - "high_error_rate"
+      - "slow_response_times"
+      - "security_breach_detected"
+
+# ============================================================================
+# DEPLOYMENT & SCALING
+# ============================================================================
+
+deployment:
+  environments:
+    development:
+      url: "http://localhost:3000"
+      database: "development"
+      features: "all"
+      
+    staging:
+      url: "https://staging.eventtracker.example.com"
+      database: "staging"
+      features: "production-like"
+      
+    production:
+      url: "https://eventtracker.example.com"
+      database: "production"
+      features: "verified_only"
+  
+  scaling:
+    horizontal_scaling: true
+    auto_scaling:
+      enabled: true
+      min_instances: 2
+      max_instances: 10
+      cpu_threshold: 70
+      memory_threshold: 80
+    
+    regions:
+      primary: "us-east-1"
+      secondary: "eu-west-1"
+      disaster_recovery: "ap-southeast-1"
+
+# ============================================================================
+# COMPLIANCE & GOVERNANCE
+# ============================================================================
+
+compliance:
+  data_protection:
+    gdpr_compliant: true
+    ccpa_compliant: true
+    hipaa_ready: false
+    
+    data_retention:
+      user_data: "30 days after event"
+      audit_logs: "1 year"
+      backup_data: "7 years"
+  
+  accessibility:
+    wcag_compliance: "AA"
+    screen_reader_support: true
+    keyboard_navigation: true
+  
+  documentation:
+    required_documents:
+      - "spec.md"
+      - "constitution.md"
+      - "projectprompttracker.md"
+      - "README.md"
+      - "API_Documentation"
+      - "User_Manual"
+    
+    update_frequency: "on_change"
+    review_cycle: "quarterly"
+
+# ============================================================================
+# AGENT OVERRIDES & EXCEPTIONS
+# ============================================================================
+
+# Note: $ARGUMENTS passed to an agent always take precedence over these settings
+agent_overrides:
+  
+  # --------------------------------------------------------------------------
+  # TASK-SPECIFIC OVERRIDES
+  # --------------------------------------------------------------------------
+  task_specific:
+    
+    database_migrations:
+      require_confirmation: true
+      backup_first: true
+      test_in_staging: true
+    
+    security_updates:
+      priority: "high"
+      apply_immediately: true
+      notify_security_team: true
+    
+    feature_deployments:
+      canary_percentage: 10
+      rollback_on_error: true
+      monitor_performance: true
+  
+  # --------------------------------------------------------------------------
+  # ENVIRONMENT-SPECIFIC OVERRIDES
+  # --------------------------------------------------------------------------
+  environment_specific:
+    
+    development:
+      autopilot_mode: true
+      test_coverage_target: 70
+      logging_level: "debug"
+    
+    production:
+      autopilot_mode: false
+      require_confirmation_for_all: true
+      logging_level: "warn"
+      monitoring_intensity: "high"
+
+# ============================================================================
+# NOTES & DOCUMENTATION
+# ============================================================================
+
+# IMPORTANT: This file is version controlled and should be updated
+# whenever project requirements or agent behavior needs change.
+
+# Update Process:
+# 1. Make changes in a feature branch
+# 2. Test changes in development environment
+# 3. Get approval from project lead
+# 4. Merge to main branch
+# 5. Deploy to staging for verification
+# 6. Deploy to production during maintenance window
+
+# Agent Behavior Priority:
+# 1. $ARGUMENTS passed to agent (highest priority)
+# 2. Environment-specific overrides
+# 3. Task-specific overrides  
+# 4. General agent configuration
+# 5. Project-specific configuration (lowest priority)
+
+# Validation:
+# - YAML syntax should be validated before committing
+# - All required fields must be present
+# - Sensitive values should use environment variables
+# - Changes should be backwards compatible when possible
