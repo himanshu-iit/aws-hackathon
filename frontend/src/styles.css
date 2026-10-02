@@ -57,15 +57,12 @@ code {
   gap: 12px;
 }
 
-.brand-mark {
+.brand-logo {
   width: 40px;
   height: 40px;
   border-radius: 10px;
-  background: linear-gradient(135deg, var(--accent), var(--accent-dim));
-  display: grid;
-  place-items: center;
-  font-weight: 700;
-  color: white;
+  display: block;
+  flex-shrink: 0;
 }
 
 .brand-title {

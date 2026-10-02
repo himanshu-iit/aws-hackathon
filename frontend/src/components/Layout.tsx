@@ -32,7 +32,7 @@ export default function Layout() {
     <div className="app-shell">
       <header className="app-header">
         <div className="brand">
-          <span className="brand-mark">ET</span>
+          <img className="brand-logo" src="/logo.svg" alt="Event Entry Guest Tracker logo" width="40" height="40" />
           <div>
             <div className="brand-title">Event Entry Guest Tracker</div>
             <div className="brand-sub">AWS · Flask · React</div>
