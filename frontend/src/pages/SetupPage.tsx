@@ -8,7 +8,7 @@ export default function SetupPage() {
   const { login: setSession } = useAuth();
   const navigate = useNavigate();
 
-  const [form, setForm] = useState({ name: "", email: "", phone: "" });
+  const [form, setForm] = useState({ name: "", email: "", phone: "", event_id: "" });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -26,11 +26,17 @@ export default function SetupPage() {
         email: form.email,
         phone: form.phone,
         name: form.name,
+        event_id: form.event_id,
         otp_email: "",
         otp_phone: "",
       });
       if (res.token) {
-        setSession(res.token, res.user?.type || "master_user", res.permissions || []);
+        setSession(
+          res.token,
+          res.user?.type || "master_user",
+          res.permissions || [],
+          res.user?.event_id || form.event_id
+        );
         navigate("/dashboard");
       } else {
         setError(res.message || "Setup did not return a session.");
@@ -59,8 +65,13 @@ export default function SetupPage() {
           <span>Phone (+CC-XXXXXXXXXX) *</span>
           <input value={form.phone} onChange={(e) => update("phone", e.target.value)} placeholder="+91-9876543210" required />
         </label>
+        <label className="field">
+          <span>Event ID (2 digits) *</span>
+          <input value={form.event_id} onChange={(e) => update("event_id", e.target.value)} placeholder="42" maxLength={2} required />
+          <small className="muted">Creates a new event. Share this ID with your volunteers.</small>
+        </label>
         <button className="btn btn-primary" disabled={loading}>
-          {loading ? "Creating…" : "Create Master Account"}
+          {loading ? "Creating…" : "Create Master Account & Event"}
         </button>
         {error && <div className="alert alert-error">{error}</div>}
       </form>

@@ -1,283 +1,136 @@
-# Event Entry Guest Tracker - Complete Implementation Guide
+# Event Entry Guest Tracker — Implementation Guide (As-Built)
 
-## Project Overview
-A comprehensive AWS-hosted event management system for tracking guest attendance with:
-- **Frontend**: React.js SPA deployed to S3 + CloudFront
-- **Backend**: Python Flask running in ECS Fargate
-- **Database**: MySQL 8.0 RDS with multi-AZ failover
-- **Logging**: AWS CloudWatch centralized logs
-- **Infrastructure**: CloudFormation IaC templates
+This guide documents the system **as actually built and deployed**. For the
+original planning artifacts see `.kiro/specs/event-entry-guest-tracker/`
+(requirements, design, tasks).
 
-## Complete Spec Documentation
-Located in: .kiro/specs/event-entry-guest-tracker/
-
-? **requirements.md** - 25 detailed requirements with acceptance criteria
-? **design.md** - Complete technical design with data models and architecture
-? **tasks.md** - 111 implementation tasks across 11 phases
-? **Correctness Properties** - 15 properties for property-based testing
-
-## Implementation Skills Required
-Located in: .kiro/skills/
-
-### Core Skills (10 Areas - 185-280 hours total)
-
-1. **aws-cloud-architecture.md** (20-30 hrs)
-   - VPC, RDS, ECS, ALB, S3, CloudFront, ECR, CloudWatch
-   - CloudFormation IaC
-
-2. **python-flask-backend.md** (30-40 hrs)
-   - Flask framework, SQLAlchemy ORM
-   - REST API design, authentication
-   
-3. **react-frontend-development.md** (25-35 hrs)
-   - React.js, React Router, Context API
-   - Responsive design, form handling
-
-4. **docker-container-deployment.md** (15-20 hrs)
-   - Dockerfile, ECR, ECS task definitions
-   - Container logging and monitoring
-
-5. **database-design-mysql.md** (20-25 hrs)
-   - Schema design, normalization
-   - Connection pooling, optimization
-
-6. **api-design-rest.md** (15-20 hrs)
-   - REST principles, HTTP semantics
-   - Error handling, versioning
-
-7. **testing-quality-assurance.md** (25-30 hrs)
-   - Unit tests (pytest, Jest)
-   - Property-based testing (Hypothesis)
-   - Load and security testing
-
-8. **devops-cicd-pipeline.md** (20-25 hrs)
-   - GitHub Actions, AWS CodePipeline
-   - Automated deployments
-
-9. **llm-integration-nlp.md** (15-20 hrs)
-   - OpenAI integration, prompt engineering
-   - Natural language query processing
-
-10. **security-authentication.md** (20-25 hrs)
-    - OTP, session management
-    - RBAC, data encryption
-
-## Implementation Phases
-
-### Phase 1: AWS Infrastructure Setup (2-3 weeks)
-Tasks: 1-10 | Skills: AWS, Docker, DevOps, Database
-- VPC and networking (multi-AZ)
-- MySQL RDS database
-- ECS Fargate cluster
-- ALB load balancer
-- S3 + CloudFront
-- ECR repository
-- CloudWatch logging
-
-### Phase 2: Backend Foundation (2-3 weeks)
-Tasks: 11-23 | Skills: Python Flask, Database, Security
-- Flask project setup
-- SQLAlchemy ORM models
-- Database connection pooling
-- CloudWatch logging integration
-- Core services (OTP, phone validation, sessions)
-- Blueprint structure
-
-### Phase 3: Frontend Foundation (1-2 weeks)
-Tasks: 25-33 | Skills: React.js, Frontend
-- React.js project setup
-- React Router navigation
-- Context API state management
-- HTTP client (Axios)
-- Build and deployment configuration
-
-### Phase 4: Authentication APIs (1-2 weeks)
-Tasks: 34-44 | Skills: Python Flask, REST API, Security
-- OTP generation/verification
-- Master user setup
-- Volunteer registration/approval
-- Session management
-- 9+ authentication endpoints
-
-### Phase 5: Guest Management (1 week)
-Tasks: 45-53 | Skills: Python Flask, Database, REST API
-- Single guest registration
-- Batch registration
-- Guest search
-- Data validation
-- 6+ guest management endpoints
-
-### Phase 6: Check-In/Check-Out Engine (2 weeks)
-Tasks: 54-61 | Skills: Python Flask, Database, Concurrency
-- Check-in transaction processing
-- Check-out with duration calculation
-- Concurrency control (pessimistic locking)
-- Session-specific tracking
-- Volunteer enforcement
-- 4+ check-in/check-out endpoints
-
-### Phase 7: Real-Time Dashboard (1-2 weeks)
-Tasks: 62-73 | Skills: Python Flask, Frontend React
-- Attendance metrics aggregation
-- Category and location breakdown
-- Capacity monitoring and alerts
-- Real-time updates (polling/SSE)
-- Dashboard UI components
-
-### Phase 8: Analytics & Reporting (1-2 weeks)
-Tasks: 74-85 | Skills: Python Flask, Database
-- Report generation (hourly, session, category)
-- Export formats: CSV, JSON, Excel, PDF
-- Peak attendance detection
-- Reporting UI components
-
-### Phase 9: Natural Language Queries (1-2 weeks)
-Tasks: 86-96 | Skills: LLM Integration, Python Flask, Security
-- LLM integration (OpenAI)
-- Query interpretation
-- Supported query types (7 patterns)
-- Access control enforcement
-- Data anonymization
-- Query caching and logging
-
-### Phase 10: Frontend Components (1-2 weeks)
-Tasks: 97-109 | Skills: React.js, API Integration
-- Dashboard components
-- Guest registration forms
-- Check-in/check-out UI
-- Analytics visualizations
-- Query interface
-- Responsive layouts
-
-### Phase 11: Testing & Deployment (2-3 weeks)
-Tasks: 110-130 | Skills: Testing, DevOps, CI/CD
-- Unit tests (pytest, Jest)
-- Integration tests
-- Property-based tests (15 properties)
-- Load testing
-- Security testing
-- CI/CD pipeline setup
-- Automated deployments
-
-## Total Estimated Timeline
-- **Aggressive**: 16-20 weeks (5 people, parallel work)
-- **Realistic**: 20-28 weeks (3-4 people, sequential phases)
-- **Conservative**: 28-40 weeks (1-2 people, careful implementation)
-
-## Team Structure (Recommended)
-- 1 Full-Stack AWS Engineer (Infrastructure + DevOps)
-- 1 Backend Engineer (Flask APIs, database)
-- 1 Frontend Engineer (React.js, UI/UX)
-- 1 QA/DevOps (Testing, CI/CD)
-
-## Getting Started
-
-### Step 1: Review Specifications
-\\\
-cd .kiro/specs/event-entry-guest-tracker/
-Review: requirements.md ? design.md ? tasks.md
-\\\
-
-### Step 2: Study Required Skills
-\\\
-cd .kiro/skills/
-Start with: skills-summary.md
-Reference: SKILLS-INDEX.md
-\\\
-
-### Step 3: Set Up Development Environment
-- AWS Account (free tier or paid)
-- Docker desktop for local testing
-- Python 3.11 + Node.js 18+
-- Git and GitHub
-- IDE: VS Code with extensions
-
-### Step 4: Start Phase 1 (Infrastructure)
-- Review: aws-cloud-architecture.md
-- Execute: Tasks 1-10
-- Checkpoint: All AWS resources deployed
-
-### Step 5: Continue Sequential Phases
-- Phases 2-3: Backend + Frontend foundations
-- Phases 4-6: Core features
-- Phases 7-9: Advanced features
-- Phases 10-11: UI + Testing
-
-## Key Success Factors
-
-? **Understand the Architecture**: AWS infrastructure must be solid
-? **Master Authentication**: OTP + session + RBAC is critical
-? **Handle Concurrency**: Check-in/check-out with 50+ simultaneous ops
-? **Test Thoroughly**: 15 correctness properties must pass
-? **Monitor Continuously**: CloudWatch dashboards from day 1
-? **Automate Early**: CI/CD pipeline in place by Phase 3
-
-## Correctness Properties (15 Properties for Testing)
-
-Property | Focus Area | Validation
----------|------------|----------
-1 | OTP Round Trip | Auth flow validation
-2 | Phone Normalization | Input validation
-3 | Volunteer Status | State transitions
-4 | Guest Persistence | Data integrity
-5 | Check-In Concurrency | Concurrent safety (50+ ops)
-6 | Check-Out Requirements | Business logic
-7 | Duration Calculation | Data accuracy
-8 | Dashboard Latency | Performance (<5s)
-9 | Attendance Consistency | Data consistency
-10 | Query Access Control | Security enforcement
-11 | Cache Invalidation | Cache coherency
-12 | Audit Immutability | Audit trail integrity
-13 | Restart Persistence | Disaster recovery
-14 | Batch Atomicity | Transaction semantics
-15 | Capacity Monitoring | Business logic accuracy
-
-## Deployment Strategy
-
-### Development Environment
-- Local Flask dev server + SQLite
-- React.js development server (npm start)
-- Docker Compose for multi-container setup
-
-### Staging Environment
-- AWS infrastructure (same as production)
-- Python Flask in ECS (2 tasks)
-- MySQL RDS (t3.micro for cost)
-- React.js deployed to S3 + CloudFront
-- Manual testing and security review
-
-### Production Environment
-- AWS infrastructure with high availability
-- Python Flask in ECS (auto-scaling 2-20 tasks)
-- MySQL RDS multi-AZ with automated backups
-- React.js with global CDN
-- Monitoring and alerting enabled
-- Automated CI/CD deployments
-
-## Production Checklist
-
-Before going live:
-- ? All tests passing (95%+ code coverage)
-- ? All 15 correctness properties validated
-- ? Load testing completed (1000+ concurrent users)
-- ? Security testing (OWASP Top 10 review)
-- ? Backup and recovery tested
-- ? Disaster recovery plan documented
-- ? On-call procedures established
-- ? Runbooks and troubleshooting guides ready
-- ? Performance baselines established
-- ? Monitoring and alerting configured
-
-## Next Steps
-
-1. **Review**: Read all spec and skill documents
-2. **Setup**: Create AWS account and development environment
-3. **Plan**: Create detailed project timeline
-4. **Assign**: Distribute tasks to team members
-5. **Execute**: Start with Phase 1 infrastructure
-6. **Monitor**: Track progress weekly against phases
-7. **Test**: Validate correctness properties continuously
-8. **Deploy**: Follow CI/CD pipeline for all changes
+**Live demo:** https://d2y60we8f8rlpl.cloudfront.net
 
 ---
-**Good luck with your implementation!**
+
+## 1. Architecture (as deployed)
+
+```
+Browser (HTTPS)
+   │
+   ▼
+CloudFront ──► S3            (React SPA — static assets)
+   │
+   └── /api/* ──► ALB ──► ECS Fargate (Flask) ──► RDS MySQL
+                                │
+                                └──► CloudWatch Logs
+```
+
+- CloudFront serves the React app from S3 and **proxies `/api/*` to the ALB**,
+  so the browser is always same-origin HTTPS (no CORS, no mixed content).
+- Flask runs as Fargate containers behind an ALB.
+- MySQL on RDS stores all data; CloudWatch collects logs.
+- No Redis / no caching layer — analytics query RDS directly.
+
+### Stack
+- **Frontend:** React 18 + TypeScript + Vite + React Router + Context API
+- **Backend:** Python 3.11 + Flask + Flask-SQLAlchemy + Gunicorn
+- **Database:** MySQL 8.0 on RDS (single-AZ)
+- **Infra:** CloudFormation, ECS Fargate, ALB, S3, CloudFront, ECR, Secrets Manager
+
+---
+
+## 2. AWS resources (us-east-1, account 100611700941)
+
+| Resource | Name / ID |
+|----------|-----------|
+| ECR repo | `event-tracker-backend` |
+| Frontend bucket | `event-tracker-frontend-100611700941` |
+| CFN templates bucket | `event-tracker-cfn-templates-100611700941` |
+| ECS cluster / service | `event-tracker-cluster` / `event-tracker-service` |
+| RDS instance | `event-tracker-db` (MySQL 8.0, single-AZ) |
+| ALB DNS | `event-tracker-alb-187512089.us-east-1.elb.amazonaws.com` |
+| CloudFront | distribution `E279XIX58XL6GT` → `d2y60we8f8rlpl.cloudfront.net` |
+| Secret | `event-tracker/prod` (Secrets Manager) |
+| Log group | `/ecs/event-tracker-app` |
+
+### CloudFormation stacks (deploy order)
+```
+event-tracker-vpc → event-tracker-iam → event-tracker-rds
+→ event-tracker-alb → event-tracker-ecs → event-tracker-cloudfront
+```
+Templates live in `infrastructure/cloudformation/`.
+
+---
+
+## 3. What was built, by phase
+
+| Phase | Scope | Status |
+|-------|-------|--------|
+| 1 | AWS infrastructure (VPC, RDS, ALB, ECS, S3/CloudFront, ECR, CloudWatch) | ✅ Deployed |
+| 2 | Flask backend foundation (models, services, logging, middleware) | ✅ |
+| 3 | React frontend foundation (routing, context, API client) | ✅ Deployed |
+| 4 | Authentication APIs (OTP, master setup, login, volunteer approval) | ✅ (OTP bypass in demo) |
+| 5 | Guest management (register, search, list, update, soft-delete) | ✅ |
+| 6 | Check-in/check-out engine (locking, duration, duplicate detection) | ✅ |
+| 7 | Real-time dashboard (metrics, category/location, capacity) | ✅ |
+| 8 | Analytics & reporting (summary, hourly, sessions, categories, peak) | ✅ (export descoped) |
+| 9 | Natural-language queries | ⏭ Skipped |
+| 10 | Frontend components (all feature pages) | ✅ Deployed |
+| 11 | Testing & verification (61 tests, ~84% coverage) | ✅ (CI/CD + docs tasks skipped) |
+
+### Later enhancements beyond the original plan
+- **OTP bypass mode** (`AUTH_BYPASS_OTP`) for open demo registration + auto-approved volunteers.
+- **Capacity limits**: 200 total users, 20 concurrent sessions (ECS env-configurable).
+- **Per-event scoping**: 2-digit event IDs; masters create an event, volunteers join an existing one, and all data is isolated per event.
+
+---
+
+## 4. Deploy / redeploy
+
+**Backend**
+```bash
+docker build --platform linux/amd64 -t event-tracker-backend:latest backend/
+docker tag  event-tracker-backend:latest 100611700941.dkr.ecr.us-east-1.amazonaws.com/event-tracker-backend:latest
+docker push 100611700941.dkr.ecr.us-east-1.amazonaws.com/event-tracker-backend:latest
+aws ecs update-service --cluster event-tracker-cluster --service event-tracker-service --force-new-deployment --region us-east-1
+```
+
+**Frontend**
+```bash
+cd frontend && npm run build
+aws s3 sync dist/ s3://event-tracker-frontend-100611700941/ --delete --region us-east-1
+aws cloudfront create-invalidation --distribution-id E279XIX58XL6GT --paths "/*"
+```
+
+**Infra change** — edit the template in `infrastructure/cloudformation/` and
+`aws cloudformation update-stack ...`.
+
+---
+
+## 5. Key configuration (ECS task env)
+
+| Variable | Default | Notes |
+|----------|---------|-------|
+| `AUTH_BYPASS_OTP` | `true` | Demo: skip OTP, auto-approve volunteers. Set `false` for real auth. |
+| `MAX_TOTAL_USERS` | `200` | masters + volunteers + guests |
+| `MAX_CONCURRENT_SESSIONS` | `20` | active sessions |
+| `AUTO_CREATE_TABLES` | `true` | create tables on startup |
+| `RESET_SCHEMA` | `false` | **destructive** full table reset; only used once to apply schema changes |
+
+---
+
+## 6. Known limitations
+
+- **Demo auth** — OTP bypassed; anyone can create a master/volunteer. Not production-safe.
+- **CloudFront masks API 403/404** — SPA fallback (403/404 → index.html) also
+  applies to `/api/*`; server-side scoping is still enforced, only the surfaced
+  error code is affected. Fix pending.
+- **Descoped**: data export (CSV/Excel/PDF), natural-language queries, batch guest upload.
+- **Not HA**: single-AZ RDS, single NAT gateway (cost-optimized for demo).
+- **No CI/CD** — manual build/deploy.
+
+---
+
+## 7. Where to look
+
+- Backend code: `backend/app/`
+- Frontend code: `frontend/src/`
+- Infra: `infrastructure/cloudformation/`
+- Tests: `backend/tests/` (`python -m pytest`)
+- Original spec: `.kiro/specs/event-entry-guest-tracker/`

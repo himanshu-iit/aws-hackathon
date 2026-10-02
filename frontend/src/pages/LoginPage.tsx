@@ -19,7 +19,7 @@ export default function LoginPage() {
     try {
       const res = await login(contact);
       if (res.token) {
-        setSession(res.token, res.user_type, res.permissions || []);
+        setSession(res.token, res.user_type, res.permissions || [], res.event_id || null);
         navigate("/dashboard");
       } else {
         // OTP mode (if ever re-enabled) returns a message instead of a token.

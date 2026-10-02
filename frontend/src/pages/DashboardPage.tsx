@@ -14,7 +14,7 @@ interface Metrics {
 }
 
 export default function DashboardPage() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, eventId } = useAuth();
   const [metrics, setMetrics] = useState<Metrics | null>(null);
   const [categories, setCategories] = useState<Record<string, { count: number; percentage: number }>>({});
   const [capacity, setCapacity] = useState<{ status: string; percentage: number | null } | null>(null);
@@ -62,7 +62,7 @@ export default function DashboardPage() {
 
   return (
     <div className="page">
-      <h1>Attendance Dashboard</h1>
+      <h1>Attendance Dashboard {eventId && <span className="muted">· Event {eventId}</span>}</h1>
       {error && <div className="alert alert-error">{error}</div>}
 
       <div className="metric-grid">

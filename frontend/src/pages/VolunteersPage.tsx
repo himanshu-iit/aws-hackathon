@@ -27,7 +27,7 @@ export default function VolunteersPage() {
   const [message, setMessage] = useState<string | null>(null);
 
   // Self-registration form (open to anyone)
-  const [reg, setReg] = useState({ name: "", phone: "", email: "" });
+  const [reg, setReg] = useState({ name: "", phone: "", email: "", event_id: "" });
 
   const load = useCallback(async () => {
     if (!isMaster) return;
@@ -50,8 +50,8 @@ export default function VolunteersPage() {
     setError(null);
     try {
       const res = await registerVolunteer(reg);
-      setMessage(`Registered. Status: ${res.status}. Awaiting approval.`);
-      setReg({ name: "", phone: "", email: "" });
+      setMessage(res.message || `Registered. Status: ${res.status}.`);
+      setReg({ name: "", phone: "", email: "", event_id: "" });
       if (isMaster) load();
     } catch (err) {
       setError(parseApiError(err).message);
@@ -84,9 +84,15 @@ export default function VolunteersPage() {
               <input value={reg.phone} onChange={(e) => setReg({ ...reg, phone: e.target.value })} placeholder="+91-9876543210" required />
             </label>
           </div>
-          <label className="field"><span>Email</span>
-            <input type="email" value={reg.email} onChange={(e) => setReg({ ...reg, email: e.target.value })} />
-          </label>
+          <div className="field-row">
+            <label className="field"><span>Email</span>
+              <input type="email" value={reg.email} onChange={(e) => setReg({ ...reg, email: e.target.value })} />
+            </label>
+            <label className="field"><span>Event ID (2 digits) *</span>
+              <input value={reg.event_id} onChange={(e) => setReg({ ...reg, event_id: e.target.value })} placeholder="42" maxLength={2} required />
+            </label>
+          </div>
+          <small className="muted">Enter the event ID your master gave you.</small>
           <button className="btn btn-primary">Register</button>
         </form>
       </div>

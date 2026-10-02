@@ -1,241 +1,239 @@
-# Event Entry Guest Tracker System
+# Event Entry Guest Tracker
 
-![Event Management](https://img.shields.io/badge/Event-Management-blue)
-![Guest Tracking](https://img.shields.io/badge/Guest-Tracking-green)
-![Volunteer Management](https://img.shields.io/badge/Volunteer-Management-orange)
-![Security](https://img.shields.io/badge/Security-OTP%20Auth-red)
+![Backend](https://img.shields.io/badge/Backend-Flask%20%2F%20Python-blue)
+![Frontend](https://img.shields.io/badge/Frontend-React%20%2F%20TypeScript-61dafb)
+![Infra](https://img.shields.io/badge/Infra-AWS%20CloudFormation-orange)
+![Database](https://img.shields.io/badge/DB-MySQL%20RDS-green)
 
-A comprehensive event management system for tracking guest entries and exits with mandatory volunteer assistance, multi-factor authentication, and real-time analytics.
+A cloud-native event guest-tracking system for managing guest registration,
+volunteer-assisted check-in/check-out, and real-time attendance analytics —
+with **per-event scoping** so each event's data stays isolated.
 
-## 🎯 Project Overview
-
-The Event Entry Guest Tracker is a sophisticated system designed for event organizers to manage guest attendance with enhanced security and accountability. The system ensures that all guest movements are properly recorded and authorized through a mandatory volunteer-assisted model.
-
-### Key Problem Solved
-Traditional event tracking systems allow self-check-in/check-out, which can lead to inaccurate attendance data and security issues. This system solves this by requiring mandatory volunteer assistance for all guest operations.
-
-## ✨ Core Features
-
-### 🔐 Authentication & Security
-- **Multi-factor Authentication**: Login via email or phone with OTP verification
-- **Phone Number Validation**: 10-digit numbers with 2-digit country code format
-- **Role-based Access Control**: Three-tier hierarchy (Master → Volunteer → Guest)
-- **First-time Setup**: Master user creation required on initial launch
-
-### 👥 User Management
-- **Master Users**: Full system administrators who approve volunteers
-- **Volunteers**: Self-register but require master user approval
-- **Guests**: Cannot self-register or self-check-in/out (mandatory volunteer assistance)
-
-### 📋 Event Operations
-- **Guest Registration**: Only by master users or approved volunteers
-- **Check-in/Check-out**: Mandatory volunteer assistance required
-- **Session Tracking**: Multi-session event support with duration tracking
-- **Real-time Monitoring**: Live attendance statistics and location tracking
-
-### 📊 Analytics & Reporting
-- **Real-time Dashboards**: Current attendance, peak times, location traffic
-- **Category Analysis**: Breakdown by guest type (VIP, Speaker, Sponsor, etc.)
-- **Export Capabilities**: CSV, JSON, Excel, PDF formats
-- **Guest Analytics**: Individual attendance patterns and preferences
-
-## 🏗️ System Architecture
-
-### User Roles Hierarchy
-```
-Master User (Admin)
-    ↓
-Volunteer (Approved by Master)
-    ↓
-Guest (Registered by Master/Volunteer)
-```
-
-### Mandatory Volunteer Assistance Model
-- ❌ Guests **cannot** self-register
-- ❌ Guests **cannot** self-check-in
-- ❌ Guests **cannot** self-check-out
-- ✅ All operations require volunteer mediation
-- ✅ Full audit trail with volunteer accountability
-
-## 📁 Repository Structure
-
-```
-aws-hackathon/
-├── README.md                   # This file - Project overview
-├── spec.md                     # Complete system specifications
-├── constitution.md             # Project governance framework
-├── projectprompttracker.md     # Development history & prompt tracking
-├── strategy.docx              # Original strategy document
-└── strategy_evententytracker.docx # Event tracker specifications
-```
-
-## 📋 Key Documents
-
-### 1. [spec.md](spec.md) - System Specifications
-Complete technical and functional specifications including:
-- Detailed feature requirements
-- Data models and architecture
-- User workflows and scenarios
-- Security considerations
-- Deployment strategies
-
-### 2. [constitution.md](constitution.md) - Project Governance
-Establishes project rules and standards:
-- **Rule 1**: Mandatory prompt tracking
-- Update requirements for AI agents
-- Quality standards and compliance
-- Project management framework
-
-### 3. [projectprompttracker.md](projectprompttracker.md) - Development History
-Complete record of all development decisions:
-- Every prompt and AI response
-- Design decisions and rationale
-- Project evolution timeline
-- Compliance with governance rules
-
-## 🚀 Getting Started
-
-### For Developers
-```bash
-# Clone the repository
-git clone https://github.com/himanshu-iit/aws-hackathon.git
-
-# Explore the specifications
-cd aws-hackathon
-```
-
-### Implementation Roadmap
-1. **Phase 1**: Authentication system (Master/Volunteer OTP login)
-2. **Phase 2**: Volunteer approval workflow
-3. **Phase 3**: Guest registration and management
-4. **Phase 4**: Check-in/check-out operations
-5. **Phase 5**: Analytics and reporting dashboard
-
-## 🔧 Technical Requirements
-
-### Authentication
-- OTP delivery via email/SMS
-- Phone number format: +[CountryCode][10-digit number]
-- Session management with automatic timeout
-- Secure credential storage
-
-### Data Models
-- User accounts with role-based permissions
-- Guest profiles with categories and special needs
-- Event sessions with timing and location
-- Attendance records with volunteer references
-
-### Security
-- Data encryption at rest and in transit
-- Audit logging of all operations
-- Compliance with data protection regulations
-- Regular security reviews
-
-## 📈 Use Cases
-
-### Event Types Supported
-- 🎤 Conferences and seminars
-- 🎪 Festivals and exhibitions
-- 🏢 Corporate events and meetings
-- 🎓 Educational workshops
-- 🏟️ Large public gatherings
-
-### Organizational Benefits
-- **Accurate Attendance**: No self-service errors
-- **Enhanced Security**: Volunteer verification at all points
-- **Real-time Insights**: Live dashboards for organizers
-- **Volunteer Management**: Streamlined approval workflow
-- **Compliance Ready**: Audit trails for all operations
-
-## 👥 Target Users
-
-### Event Organizers
-- Master users who manage the entire system
-- Configure events and permissions
-- Approve volunteer registrations
-- Generate comprehensive reports
-
-### Volunteers
-- Assist guests with check-in/check-out
-- Register new guests
-- Provide personal assistance
-- Ensure proper attendance tracking
-
-### Guests
-- Enjoy seamless event experience
-- Receive personal assistance
-- Have accurate attendance records
-- Special needs accommodated
-
-## 🏆 Unique Selling Points
-
-### 1. **Mandatory Volunteer Assistance**
-Unlike other systems, this ensures 100% accurate attendance tracking through required volunteer mediation.
-
-### 2. **Multi-factor Authentication**
-Secure OTP-based login via both email and phone with strict phone number validation.
-
-### 3. **Complete Audit Trail**
-Every action is logged with user references, providing full accountability.
-
-### 4. **Real-time Analytics**
-Live dashboards showing current attendance, peak times, and location traffic.
-
-### 5. **Scalable Architecture**
-Designed to handle events of all sizes from small meetings to large festivals.
-
-## 📊 Project Status
-
-### ✅ Completed
-- Complete system specification (spec.md)
-- Project governance framework (constitution.md)
-- Development history tracking (projectprompttracker.md)
-- GitHub repository setup with version control
-
-### 🚧 In Progress
-- Technical implementation planning
-- Architecture design
-- Technology stack selection
-
-### 📅 Planned
-- Backend development
-- Frontend interface
-- Mobile applications
-- Integration testing
-
-## 🤝 Contributing
-
-### Development Process
-1. Review the [spec.md](spec.md) for requirements
-2. Follow governance rules in [constitution.md](constitution.md)
-3. Document all changes in [projectprompttracker.md](projectprompttracker.md)
-4. Submit pull requests with detailed descriptions
-
-### Code Standards
-- Follow specifications exactly
-- Maintain security standards
-- Include comprehensive testing
-- Document all changes
-
-## 📞 Contact & Support
-
-### Repository Owner
-- **GitHub**: [himanshu-iit](https://github.com/himanshu-iit)
-- **Email**: guptahim@msn.com
-
-### Project Documentation
-- Full specifications: [spec.md](spec.md)
-- Governance rules: [constitution.md](constitution.md)
-- Development history: [projectprompttracker.md](projectprompttracker.md)
-
-## 📄 License
-
-This project is developed for the AWS Hackathon. All documentation is open for review and collaboration.
+> **Live demo:** https://d2y60we8f8rlpl.cloudfront.net
 
 ---
 
-**🌟 Star this repository if you find the project interesting!**
+## What it does
 
-**🔔 Watch for updates as development progresses!**
+- **Master users** create an event (identified by a 2-digit ID) and administer it.
+- **Volunteers** self-register into an existing event and assist with guest operations.
+- **Guests** are registered and checked in/out by masters or volunteers (no self-service).
+- **Real-time dashboard** and **analytics** show attendance, categories, capacity, and hourly trends.
+- **Event isolation** — users only see the data for the event they logged into.
 
-**💬 Open issues for questions or suggestions!**
+---
+
+## Architecture
+
+```
+Browser (HTTPS)
+   │
+   ▼
+CloudFront ──► S3            (React SPA — static assets)
+   │
+   └── /api/* ──► ALB ──► ECS Fargate (Flask) ──► RDS MySQL
+                                │
+                                └──► CloudWatch Logs
+```
+
+- The browser only ever talks **HTTPS to CloudFront**. CloudFront serves the
+  React app from S3 and **proxies `/api/*` to the ALB** (same-origin, so no CORS
+  and no mixed-content issues).
+- The Flask backend runs as containers on **ECS Fargate** behind an **ALB**.
+- Data is stored in **MySQL on RDS**; logs stream to **CloudWatch**.
+- All infrastructure is defined as **CloudFormation** templates.
+
+### Technology stack
+
+| Layer | Technology |
+|-------|------------|
+| Frontend | React 18, TypeScript, Vite, React Router, Context API, Axios |
+| Backend | Python 3.11, Flask, Flask-SQLAlchemy, Gunicorn |
+| Database | MySQL 8.0 (Amazon RDS, single-AZ) |
+| Hosting | S3 + CloudFront (frontend), ECS Fargate + ALB (backend) |
+| Registry | Amazon ECR |
+| Secrets | AWS Secrets Manager |
+| Logging | AWS CloudWatch Logs |
+| IaC | AWS CloudFormation |
+
+---
+
+## Repository layout
+
+```
+zerotohero/
+├── backend/                     # Flask API
+│   ├── app/
+│   │   ├── factory.py           # app factory
+│   │   ├── models/              # SQLAlchemy models (user, guest, auth, attendance)
+│   │   ├── services/            # phone/OTP/session/analytics/checkin/limits
+│   │   ├── blueprints/          # auth, volunteers, guests, checkin, analytics, health
+│   │   ├── auth_utils.py        # auth decorators + event-scope helper
+│   │   └── middleware.py        # request IDs, security headers, error handling
+│   ├── tests/                   # pytest + hypothesis (61 tests)
+│   ├── Dockerfile
+│   └── requirements.txt
+├── frontend/                    # React SPA
+│   └── src/
+│       ├── pages/               # login, setup, dashboard, guests, check-in, analytics, volunteers
+│       ├── services/            # api.ts (axios), endpoints.ts
+│       └── context/             # AuthContext
+├── infrastructure/cloudformation/
+│   ├── vpc.yaml                 # VPC, subnets, 1 NAT gateway, security groups
+│   ├── iam.yaml                 # ECS task roles, RDS monitoring role
+│   ├── rds.yaml                 # MySQL 8.0 (single-AZ)
+│   ├── alb.yaml                 # Application Load Balancer + target group
+│   ├── ecs.yaml                 # Fargate cluster, task definition, service, autoscaling
+│   └── cloudfront.yaml          # CloudFront + S3 bucket policy (OAC)
+└── .kiro/specs/                 # requirements, design, and task breakdown
+```
+
+---
+
+## How event scoping works
+
+1. A **master** registers via **Setup**, choosing a new **2-digit event ID**
+   (e.g. `42`). The ID must be unique — duplicates are rejected.
+2. The master shares that event ID with their **volunteers**, who register into
+   the **existing** event (joining a non-existent event is rejected).
+3. Every user's session carries their `event_id`. Guest registration,
+   check-in/out, dashboard, and analytics are all restricted to that event —
+   users cannot see or modify another event's data.
+
+---
+
+## Core features
+
+### Authentication
+- Login by email or phone. A master account is created via **Setup**.
+- **OTP is currently bypassed (demo mode)** — see Configuration below.
+- Session tokens with expiry and revocation; role-based access control
+  (master vs. volunteer).
+
+### Guest management
+- Register guests with contact, professional, emergency-contact, and
+  event-specific details; 7 guest categories (General Attendee, VIP, Speaker,
+  Staff, Volunteer, Press, Sponsor).
+- Search by name (substring) or exact phone/email/ticket/badge.
+- Phone numbers are stored canonically as `+CC-XXXXXXXXXX` and are immutable
+  after registration.
+
+### Check-in / check-out
+- Volunteer-assisted check-in and check-out with duration tracking.
+- Duplicate check-in detection with a re-check-in confirmation path.
+- Rich confirmations: VIP/Speaker highlight, dietary/accessibility needs.
+
+### Dashboard & analytics
+- Live attendance metrics (present, departed, not-checked-in, peak) with
+  polling.
+- Breakdowns by category and location; capacity status; hourly check-in trends.
+
+### Limits
+- Max **200 total users** (masters + volunteers + guests) per deployment.
+- Max **20 concurrent active sessions**.
+
+---
+
+## Running locally
+
+### Backend
+```bash
+cd backend
+pip install -r requirements.txt
+copy .env.example .env     # defaults to a local SQLite DB
+python wsgi.py             # http://localhost:5000/api/health
+python -m pytest           # run the test suite
+```
+With no `DATABASE_URL`, the backend uses a local SQLite file and auto-creates
+tables, so it runs without MySQL.
+
+### Frontend
+```bash
+cd frontend
+npm install
+npm run dev                # http://localhost:5173  (proxied API via VITE_API_BASE_URL)
+```
+
+---
+
+## Deployment
+
+### Infrastructure (CloudFormation, deploy in order)
+```
+vpc → iam → rds → alb → ecs → cloudfront
+```
+
+### Backend
+```bash
+# build + push image
+docker build --platform linux/amd64 -t event-tracker-backend:latest backend/
+docker tag event-tracker-backend:latest <acct>.dkr.ecr.us-east-1.amazonaws.com/event-tracker-backend:latest
+docker push <acct>.dkr.ecr.us-east-1.amazonaws.com/event-tracker-backend:latest
+# roll out
+aws ecs update-service --cluster event-tracker-cluster --service event-tracker-service --force-new-deployment
+```
+
+### Frontend
+```bash
+cd frontend
+npm run build
+aws s3 sync dist/ s3://event-tracker-frontend-<acct>/ --delete
+aws cloudfront create-invalidation --distribution-id <id> --paths "/*"
+```
+
+---
+
+## Configuration
+
+Key environment variables (set on the ECS task definition, values from
+Secrets Manager where sensitive):
+
+| Variable | Purpose |
+|----------|---------|
+| `DATABASE_URL` | MySQL connection string (from Secrets Manager) |
+| `AUTH_BYPASS_OTP` | `true` = skip OTP, auto-approve volunteers (demo). Set `false` for real auth. |
+| `MAX_TOTAL_USERS` | Total-user cap (default `200`) |
+| `MAX_CONCURRENT_SESSIONS` | Active-session cap (default `20`) |
+| `AUTO_CREATE_TABLES` | Create tables on startup when `true` |
+| `RESET_SCHEMA` | **Destructive** — drops & recreates all tables when `true`. Keep `false`. |
+| `CLOUDWATCH_LOG_GROUP` | Log group for app logs |
+
+OTP delivery (when `AUTH_BYPASS_OTP=false`) uses Twilio (SMS) and SendGrid
+(email); provide their keys in the `event-tracker/prod` secret.
+
+---
+
+## Testing
+
+```bash
+cd backend
+python -m pytest --cov=app
+```
+- **61 tests**, ~84% coverage.
+- Includes property-based tests (Hypothesis) for phone normalization, OTP
+  round-trip, check-in concurrency, duration accuracy, and data persistence,
+  plus integration and security (RBAC, session, SQL-injection) tests.
+
+---
+
+## Known limitations
+
+- **Demo auth**: OTP is bypassed and anyone can create a master or volunteer.
+  Not production-safe until `AUTH_BYPASS_OTP=false` and real OTP delivery are
+  enabled.
+- **CloudFront masks API 403/404**: the SPA fallback (403/404 → `index.html`)
+  also applies to `/api/*`, so API 403/404 responses can surface as the SPA page
+  in the browser. Data scoping is still enforced server-side; this only affects
+  how those two error codes are surfaced. Fix pending (scope the SPA fallback to
+  the S3 origin only).
+- **No data export** (CSV/Excel/PDF) and **no natural-language query** feature —
+  these were descoped.
+- **Single-AZ RDS** and a **single NAT gateway** — cost-optimized for a demo,
+  not highly available.
+- **No CI/CD pipeline** — builds and deploys are run manually.
+
+---
+
+## License
+
+Developed for demonstration purposes.
