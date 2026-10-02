@@ -102,12 +102,20 @@ code {
   color: white;
 }
 
-.app-main {
+.app-body {
   flex: 1;
-  padding: 32px 28px;
-  max-width: 1000px;
+  display: flex;
+  gap: 24px;
+  max-width: 1280px;
   margin: 0 auto;
   width: 100%;
+  padding: 32px 28px;
+  align-items: flex-start;
+}
+
+.app-main {
+  flex: 1;
+  min-width: 0; /* allow children (tables) to shrink/scroll */
 }
 
 .app-footer {
@@ -556,4 +564,134 @@ select:focus {
     animation: none !important;
     transition: none !important;
   }
+}
+
+/* ── Steps guide (sidebar on desktop, stacked below on mobile) ────────────── */
+.steps-guide {
+  width: 290px;
+  flex-shrink: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  position: sticky;
+  top: 24px;
+}
+
+.steps-title {
+  margin: 0 0 14px;
+  font-size: 1rem;
+  color: var(--text);
+}
+
+.steps-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.step-item {
+  display: flex;
+  gap: 12px;
+}
+
+.step-num {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent-dim));
+  color: white;
+  font-weight: 700;
+  font-size: 0.85rem;
+  display: grid;
+  place-items: center;
+}
+
+.step-head {
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
+.step-body {
+  margin: 2px 0 4px;
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  line-height: 1.4;
+}
+
+.step-link {
+  font-size: 0.8rem;
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.step-link:hover {
+  text-decoration: underline;
+}
+
+/* Stack the guide BELOW the page content on tablet/mobile */
+@media (max-width: 900px) {
+  .app-body {
+    flex-direction: column;
+    padding: 24px 18px;
+  }
+
+  .steps-guide {
+    width: 100%;
+    position: static;
+  }
+
+  /* Horizontal step strip on wider-but-stacked screens */
+  .steps-list {
+    flex-direction: row;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    gap: 12px;
+    padding-bottom: 4px;
+  }
+
+  .step-item {
+    min-width: 220px;
+  }
+}
+
+/* On phones, go back to a simple vertical list below the content */
+@media (max-width: 600px) {
+  .app-body {
+    padding: 18px 14px;
+    gap: 18px;
+  }
+
+  .steps-list {
+    flex-direction: column;
+  }
+
+  .step-item {
+    min-width: 0;
+  }
+}
+
+/* ── Guide page ──────────────────────────────────────────────────────────── */
+.guide-step-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 0;
+  font-size: 1.05rem;
+}
+
+.guide-points {
+  margin: 0 0 14px;
+  padding-left: 20px;
+  color: var(--text-dim);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.guide-points li {
+  margin-bottom: 6px;
 }

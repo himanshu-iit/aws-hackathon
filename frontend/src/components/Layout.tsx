@@ -1,6 +1,7 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { logout as apiLogout } from "../services/endpoints";
+import StepsGuide from "./StepsGuide";
 
 const navItems = [
   { to: "/dashboard", label: "Dashboard" },
@@ -9,6 +10,7 @@ const navItems = [
   { to: "/check-in", label: "Check-In" },
   { to: "/analytics", label: "Analytics" },
   { to: "/volunteers", label: "Volunteers" },
+  { to: "/guide", label: "Guide" },
   { to: "/status", label: "Status" },
 ];
 
@@ -57,9 +59,12 @@ export default function Layout() {
           )}
         </nav>
       </header>
-      <main className="app-main">
-        <Outlet />
-      </main>
+      <div className="app-body">
+        <main className="app-main">
+          <Outlet />
+        </main>
+        <StepsGuide />
+      </div>
       <footer className="app-footer">
         Event Entry Guest Tracker — S3 + CloudFront → ALB → ECS Fargate → RDS MySQL
       </footer>

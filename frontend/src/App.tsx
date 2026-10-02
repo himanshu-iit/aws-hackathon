@@ -3,6 +3,7 @@ import Layout from "./components/Layout";
 import StatusPage from "./pages/StatusPage";
 import LoginPage from "./pages/LoginPage";
 import SetupPage from "./pages/SetupPage";
+import GuidePage from "./pages/GuidePage";
 import DashboardPage from "./pages/DashboardPage";
 import GuestRegistrationPage from "./pages/GuestRegistrationPage";
 import GuestsPage from "./pages/GuestsPage";
@@ -19,6 +20,7 @@ export default function App() {
         <Route path="/status" element={<StatusPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/setup" element={<SetupPage />} />
+        <Route path="/guide" element={<GuidePage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/guests" element={<GuestsPage />} />
         <Route path="/guests/register" element={<GuestRegistrationPage />} />
