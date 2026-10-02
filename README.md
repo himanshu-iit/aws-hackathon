@@ -13,6 +13,58 @@ with **per-event scoping** so each event's data stays isolated.
 
 ---
 
+## How to use the application
+
+Follow these steps in order. The app works on mobile, tablet, and desktop
+browsers.
+
+### 1. Register as a Master (creates the event)
+1. Open the app and go to **Setup** (`/setup`).
+2. Enter your **name, email, phone** (`+CC-XXXXXXXXXX`, e.g. `+91-9876543210`),
+   and a **2-digit Event ID** of your choice (e.g. `42`).
+3. Submit. This creates your master account **and** the event. You are logged
+   in automatically and land on the dashboard.
+   - The Event ID must be **unique** — if it already exists, pick another.
+   - **Share this Event ID with your volunteers.**
+
+### 2. Volunteers register themselves (into your event)
+1. A volunteer opens the app and goes to **Volunteers** (`/volunteers`).
+2. They fill in **name, phone, (optional) email**, and the **Event ID** you gave
+   them.
+3. On submit they are registered for that event. (In the current demo mode they
+   are **auto-approved** and can log in immediately. With approvals enabled, the
+   master approves them from the Volunteers page first.)
+   - Entering an Event ID that doesn't exist is rejected.
+
+### 3. Register guests (Master or Volunteer)
+1. Log in, then go to **Register** (`/guests/register`).
+2. Enter the guest's details and category (General Attendee, VIP, Speaker,
+   Staff, Volunteer, Press, Sponsor). The guest is automatically added to **your
+   event** — you don't pick the event here.
+3. View everyone under **Guests** (`/guests`).
+
+### 4. Check guests in and out
+1. Go to **Check-In** (`/check-in`).
+2. Search for a guest by name, then **Check In** (or **Check Out**).
+3. Duplicate check-ins are flagged; VIP/Speaker and dietary/accessibility needs
+   are highlighted on the confirmation.
+
+### 5. Monitor the event
+- **Dashboard** (`/dashboard`) — live counts (present, departed, not checked in,
+  peak) that refresh automatically, plus category and capacity breakdowns.
+- **Analytics** (`/analytics`) — totals, per-category stats, and an hourly
+  check-in chart.
+
+### Logging in later
+Use **Login** (`/login`) with the email or phone you registered with. Each user
+only sees the data for the **event they belong to**.
+
+> **Demo note:** one-time passwords (OTP) are currently bypassed, so login and
+> registration are open and require no verification code. This is for
+> demonstration only — see *Configuration* and *Known limitations* below.
+
+---
+
 ## What it does
 
 - **Master users** create an event (identified by a 2-digit ID) and administer it.
