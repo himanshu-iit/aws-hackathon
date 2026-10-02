@@ -1,0 +1,122 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Event Tracker - MySQL 8.0 RDS, Multi-AZ, Encrypted, Automated Backups'
+
+Parameters:
+  ProjectName:
+    Type: String
+    Default: event-tracker
+  DBInstanceClass:
+    Type: String
+    Default: db.t3.micro
+    AllowedValues: [db.t3.micro, db.t3.small, db.t3.medium]
+  DBName:
+    Type: String
+    Default: eventtracker
+  DBUsername:
+    Type: String
+    Default: admin
+    NoEcho: true
+  DBPassword:
+    Type: String
+    NoEcho: true
+    MinLength: 12
+    Description: 'RDS master password (min 12 chars)'
+
+Resources:
+
+  # ─── DB SUBNET GROUP ───────────────────────────────────────────────────────
+  DBSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: 'Private subnets for RDS MySQL'
+      SubnetIds:
+        - !ImportValue 'event-tracker-PrivateSubnetA'
+        - !ImportValue 'event-tracker-PrivateSubnetB'
+      Tags:
+        - Key: Name
+          Value: !Sub '${ProjectName}-db-subnet-group'
+        - Key: Project
+          Value: !Ref ProjectName
+
+  # ─── DB PARAMETER GROUP ────────────────────────────────────────────────────
+  DBParameterGroup:
+    Type: AWS::RDS::DBParameterGroup
+    Properties:
+      Description: 'MySQL 8.0 parameter group for Event Tracker'
+      Family: mysql8.0
+      Parameters:
+        max_connections: '200'
+        innodb_buffer_pool_size: '{DBInstanceClassMemory*3/4}'
+        slow_query_log: '1'
+        long_query_time: '2'
+        general_log: '0'
+        character_set_server: utf8mb4
+        collation_server: utf8mb4_unicode_ci
+      Tags:
+        - Key: Project
+          Value: !Ref ProjectName
+
+  # ─── RDS INSTANCE ──────────────────────────────────────────────────────────
+  RDSInstance:
+    Type: AWS::RDS::DBInstance
+    DeletionPolicy: Snapshot
+    UpdateReplacePolicy: Snapshot
+    Properties:
+      DBInstanceIdentifier: !Sub '${ProjectName}-db'
+      DBName: !Ref DBName
+      DBInstanceClass: !Ref DBInstanceClass
+      Engine: mysql
+      EngineVersion: '8.0'
+      MasterUsername: !Ref DBUsername
+      MasterUserPassword: !Ref DBPassword
+      DBSubnetGroupName: !Ref DBSubnetGroup
+      VPCSecurityGroups:
+        - !ImportValue 'event-tracker-RDSSecurityGroup'
+      DBParameterGroupName: !Ref DBParameterGroup
+      # High Availability
+      MultiAZ: false
+      # Storage
+      AllocatedStorage: '20'
+      MaxAllocatedStorage: '100'
+      StorageType: gp3
+      StorageEncrypted: true
+      # Backups
+      BackupRetentionPeriod: 30
+      PreferredBackupWindow: '02:00-03:00'
+      PreferredMaintenanceWindow: 'sun:04:00-sun:05:00'
+      # Monitoring
+      MonitoringInterval: 0
+      # No Performance Insights on db.t3.micro
+      # Networking
+      PubliclyAccessible: false
+      # Logging
+      EnableCloudwatchLogsExports:
+        - error
+        - slowquery
+      # Auto minor version upgrades
+      AutoMinorVersionUpgrade: true
+      CopyTagsToSnapshot: true
+      Tags:
+        - Key: Name
+          Value: !Sub '${ProjectName}-db'
+        - Key: Project
+          Value: !Ref ProjectName
+
+Outputs:
+  RDSEndpoint:
+    Description: RDS MySQL endpoint address
+    Value: !GetAtt RDSInstance.Endpoint.Address
+    Export:
+      Name: !Sub '${ProjectName}-RDSEndpoint'
+
+  RDSPort:
+    Description: RDS MySQL port
+    Value: !GetAtt RDSInstance.Endpoint.Port
+    Export:
+      Name: !Sub '${ProjectName}-RDSPort'
+
+  RDSInstanceId:
+    Description: RDS instance identifier
+    Value: !Ref RDSInstance
+    Export:
+      Name: !Sub '${ProjectName}-RDSInstanceId'

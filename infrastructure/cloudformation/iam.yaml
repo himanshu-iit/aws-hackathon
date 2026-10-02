@@ -1,0 +1,142 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Event Tracker - IAM Roles for ECS Task Execution, Task Role, and RDS Monitoring'
+
+Parameters:
+  ProjectName:
+    Type: String
+    Default: event-tracker
+  AccountId:
+    Type: String
+    Default: '100611700941'
+
+Resources:
+
+  # ─── ECS TASK EXECUTION ROLE ───────────────────────────────────────────────
+  # Used by ECS agent to pull images from ECR and ship logs to CloudWatch
+  ECSTaskExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${ProjectName}-ecs-execution-role'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+      Policies:
+        - PolicyName: SecretsManagerAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                Resource:
+                  - !Sub 'arn:aws:secretsmanager:us-east-1:${AccountId}:secret:${ProjectName}/prod*'
+        - PolicyName: CloudWatchLogsAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                  - logs:DescribeLogStreams
+                Resource:
+                  - !Sub 'arn:aws:logs:us-east-1:${AccountId}:log-group:/ecs/${ProjectName}-app:*'
+                  - !Sub 'arn:aws:logs:us-east-1:${AccountId}:log-group:/audit/${ProjectName}:*'
+      Tags:
+        - Key: Project
+          Value: !Ref ProjectName
+
+  # ─── ECS TASK ROLE ─────────────────────────────────────────────────────────
+  # Runtime permissions for the Flask application inside the container
+  ECSTaskRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${ProjectName}-ecs-task-role'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: CloudWatchLogsWrite
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                  - logs:DescribeLogGroups
+                  - logs:DescribeLogStreams
+                Resource:
+                  - !Sub 'arn:aws:logs:us-east-1:${AccountId}:log-group:/ecs/${ProjectName}-app:*'
+                  - !Sub 'arn:aws:logs:us-east-1:${AccountId}:log-group:/audit/${ProjectName}:*'
+        - PolicyName: SecretsManagerRead
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                  - secretsmanager:DescribeSecret
+                Resource:
+                  - !Sub 'arn:aws:secretsmanager:us-east-1:${AccountId}:secret:${ProjectName}/prod*'
+        - PolicyName: S3ExportAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:PutObject
+                  - s3:GetObject
+                Resource:
+                  - !Sub 'arn:aws:s3:::${ProjectName}-frontend-${AccountId}/exports/*'
+      Tags:
+        - Key: Project
+          Value: !Ref ProjectName
+
+  # ─── RDS ENHANCED MONITORING ROLE ──────────────────────────────────────────
+  RDSMonitoringRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${ProjectName}-rds-monitoring-role'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: monitoring.rds.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonRDSEnhancedMonitoringRole
+      Tags:
+        - Key: Project
+          Value: !Ref ProjectName
+
+Outputs:
+  ECSTaskExecutionRoleArn:
+    Description: ECS Task Execution Role ARN
+    Value: !GetAtt ECSTaskExecutionRole.Arn
+    Export:
+      Name: !Sub '${ProjectName}-ECSTaskExecutionRoleArn'
+
+  ECSTaskRoleArn:
+    Description: ECS Task Role ARN
+    Value: !GetAtt ECSTaskRole.Arn
+    Export:
+      Name: !Sub '${ProjectName}-ECSTaskRoleArn'
+
+  RDSMonitoringRoleArn:
+    Description: RDS Enhanced Monitoring Role ARN
+    Value: !GetAtt RDSMonitoringRole.Arn
+    Export:
+      Name: !Sub '${ProjectName}-RDSMonitoringRoleArn'

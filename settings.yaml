@@ -10,8 +10,8 @@ project:
   name: "Event Entry Guest Tracker"
   version: "1.0.0"
   description: "Comprehensive event management system with mandatory volunteer assistance and LLM-powered natural language queries"
-  repository: "https://github.com/himanshu-iit/aws-hackathon"
-  owner: "himanshu-iit"
+  repository: "https://github.ibm.com/higupta0/aws-hackathon-oct-06"
+  owner: "higupta0"
   contact: "guptahim@msn.com"
 
 # ============================================================================
@@ -39,7 +39,7 @@ agent:
   # --------------------------------------------------------------------------
   code_quality:
     enforce_code_style: true
-    language: "typescript"  # Primary implementation language
+    language: "python/typescript"  # Backend: Python Flask, Frontend: React TypeScript
     test_coverage_target: 80
     lint_on_save: true
     format_on_save: true
@@ -80,6 +80,8 @@ agent:
       commit_message_format: "conventional"
       require_pull_requests: true
       protected_branches: ["main", "master"]
+      commit_strategy: "manual"  # Only commit when explicitly prompted by user
+      auto_commit: false  # Disable automatic commits on file updates
       
     testing:
       run_tests_on_push: true
@@ -196,21 +198,16 @@ project_specific:
   # DATABASE CONFIGURATION
   # --------------------------------------------------------------------------
   database:
-    primary: "postgresql"
-    backup: "mongodb"
-    
-    postgresql:
-      connection_pool: 20
-      migration_automation: true
-      backup_frequency: "daily"
-      
-    mongodb:
-      use_for: ["session_store", "query_cache", "audit_logs"]
-      ttl_indexes: true
-    
-    redis:
-      use_for: ["session_cache", "rate_limiting", "real_time_updates"]
-      default_ttl_seconds: 3600
+    primary: "mysql"
+    engine_version: "8.0"
+    host_env_var: "DB_HOST"
+    port: 3306
+    connection_pool: 20
+    max_overflow: 40
+    pool_recycle_seconds: 3600
+    migration_automation: true
+    backup_frequency: "daily"
+    # No Redis / no caching layer — direct RDS queries only
 
 # ============================================================================
 # INTEGRATION CONFIGURATION
@@ -265,12 +262,14 @@ monitoring:
   logging:
     level: "info"
     format: "json"
-    retention_days: 90
+    retention_days: 30
+    provider: "aws_cloudwatch"
     
-    destinations:
-      - "console"
-      - "file"
-      - "elasticsearch"
+    log_groups:
+      app:   "/ecs/event-tracker-app"
+      audit: "/audit/event-tracker"
+      alb:   "/alb/event-tracker-alb"
+      rds:   "/rds/event-tracker-db"
   
   metrics:
     collection_interval_seconds: 60
@@ -305,7 +304,7 @@ monitoring:
 deployment:
   environments:
     development:
-      url: "http://localhost:3000"
+      url: "http://localhost:5000"
       database: "development"
       features: "all"
       
@@ -324,14 +323,68 @@ deployment:
     auto_scaling:
       enabled: true
       min_instances: 2
-      max_instances: 10
+      max_instances: 20
       cpu_threshold: 70
       memory_threshold: 80
     
     regions:
       primary: "us-east-1"
-      secondary: "eu-west-1"
-      disaster_recovery: "ap-southeast-1"
+
+# ============================================================================
+# AWS INFRASTRUCTURE
+# ============================================================================
+
+aws:
+  account_id: "100611700941"
+  region: "us-east-1"
+  iam_user: "aws-hackathon-deployer"
+  iam_arn: "arn:aws:iam::100611700941:user/aws-hackathon-deployer"
+
+  ecr:
+    repository_name: "event-tracker-backend"
+    repository_uri: "100611700941.dkr.ecr.us-east-1.amazonaws.com/event-tracker-backend"
+
+  s3:
+    frontend_bucket: "event-tracker-frontend-100611700941"
+    cfn_templates_bucket: "event-tracker-cfn-templates-100611700941"
+
+  cloudwatch:
+    log_groups:
+      app:     "/ecs/event-tracker-app"
+      audit:   "/audit/event-tracker"
+      alb:     "/alb/event-tracker-alb"
+      rds:     "/rds/event-tracker-db"
+    retention_days: 30
+
+  ecs:
+    cluster_name: "event-tracker-cluster"
+    service_name: "event-tracker-service"
+    task_family:  "event-tracker-task"
+    container_port: 5000
+    cpu: 512
+    memory: 1024
+    min_tasks: 2
+    max_tasks: 20
+    cpu_target: 70
+
+  rds:
+    db_identifier: "event-tracker-db"
+    engine: "mysql"
+    engine_version: "8.0"
+    instance_class: "db.t3.micro"
+    db_name: "eventtracker"
+    multi_az: true
+    backup_retention_days: 30
+
+  cloudformation:
+    stacks:
+      vpc:        "event-tracker-vpc"
+      rds:        "event-tracker-rds"
+      ecs:        "event-tracker-ecs"
+      alb:        "event-tracker-alb"
+      s3:         "event-tracker-s3"
+      cloudfront: "event-tracker-cloudfront"
+      iam:        "event-tracker-iam"
 
 # ============================================================================
 # COMPLIANCE & GOVERNANCE

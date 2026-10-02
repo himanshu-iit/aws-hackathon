@@ -1,0 +1,196 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Event Tracker - ECS Fargate Cluster, Task Definition, Service, Auto-Scaling'
+
+Parameters:
+  ProjectName:
+    Type: String
+    Default: event-tracker
+  AccountId:
+    Type: String
+    Default: '100611700941'
+  ECRImageUri:
+    Type: String
+    Default: '100611700941.dkr.ecr.us-east-1.amazonaws.com/event-tracker-backend:latest'
+    Description: 'Full ECR image URI including tag'
+  TaskCPU:
+    Type: String
+    Default: '512'
+    AllowedValues: ['256', '512', '1024', '2048']
+  TaskMemory:
+    Type: String
+    Default: '1024'
+    AllowedValues: ['512', '1024', '2048', '3072']
+  DesiredCount:
+    Type: Number
+    Default: 2
+  MinCount:
+    Type: Number
+    Default: 2
+  MaxCount:
+    Type: Number
+    Default: 20
+
+Resources:
+
+  # ─── ECS CLUSTER ───────────────────────────────────────────────────────────
+  ECSCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: !Sub '${ProjectName}-cluster'
+      CapacityProviders:
+        - FARGATE
+        - FARGATE_SPOT
+      DefaultCapacityProviderStrategy:
+        - CapacityProvider: FARGATE
+          Weight: 1
+      ClusterSettings:
+        - Name: containerInsights
+          Value: enabled
+      Tags:
+        - Key: Project
+          Value: !Ref ProjectName
+
+  # ─── TASK DEFINITION ───────────────────────────────────────────────────────
+  TaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Sub '${ProjectName}-task'
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      Cpu: !Ref TaskCPU
+      Memory: !Ref TaskMemory
+      ExecutionRoleArn: !ImportValue 'event-tracker-ECSTaskExecutionRoleArn'
+      TaskRoleArn: !ImportValue 'event-tracker-ECSTaskRoleArn'
+      ContainerDefinitions:
+        - Name: !Sub '${ProjectName}-container'
+          Image: !Ref ECRImageUri
+          Essential: true
+          PortMappings:
+            - ContainerPort: 5000
+              Protocol: tcp
+          Environment:
+            - Name: FLASK_ENV
+              Value: production
+            - Name: AWS_REGION
+              Value: us-east-1
+            - Name: CLOUDWATCH_LOG_GROUP
+              Value: !Sub '/ecs/${ProjectName}-app'
+            - Name: AUTO_CREATE_TABLES
+              Value: 'true'
+          Secrets:
+            - Name: DATABASE_URL
+              ValueFrom: !Sub 'arn:aws:secretsmanager:us-east-1:${AccountId}:secret:${ProjectName}/prod:DATABASE_URL::'
+            - Name: FLASK_SECRET_KEY
+              ValueFrom: !Sub 'arn:aws:secretsmanager:us-east-1:${AccountId}:secret:${ProjectName}/prod:FLASK_SECRET_KEY::'
+            - Name: LLM_API_KEY
+              ValueFrom: !Sub 'arn:aws:secretsmanager:us-east-1:${AccountId}:secret:${ProjectName}/prod:LLM_API_KEY::'
+            - Name: SENDGRID_API_KEY
+              ValueFrom: !Sub 'arn:aws:secretsmanager:us-east-1:${AccountId}:secret:${ProjectName}/prod:SENDGRID_API_KEY::'
+            - Name: TWILIO_API_KEY
+              ValueFrom: !Sub 'arn:aws:secretsmanager:us-east-1:${AccountId}:secret:${ProjectName}/prod:TWILIO_API_KEY::'
+            - Name: CORS_ORIGINS
+              ValueFrom: !Sub 'arn:aws:secretsmanager:us-east-1:${AccountId}:secret:${ProjectName}/prod:CORS_ORIGINS::'
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Sub '/ecs/${ProjectName}-app'
+              awslogs-region: us-east-1
+              awslogs-stream-prefix: flask
+          HealthCheck:
+            Command:
+              - CMD-SHELL
+              - 'curl -f http://localhost:5000/api/health || exit 1'
+            Interval: 30
+            Timeout: 10
+            Retries: 3
+            StartPeriod: 60
+      Tags:
+        - Key: Project
+          Value: !Ref ProjectName
+
+  # ─── ECS SERVICE ───────────────────────────────────────────────────────────
+  ECSService:
+    Type: AWS::ECS::Service
+    Properties:
+      ServiceName: !Sub '${ProjectName}-service'
+      Cluster: !Ref ECSCluster
+      TaskDefinition: !Ref TaskDefinition
+      LaunchType: FARGATE
+      DesiredCount: !Ref DesiredCount
+      DeploymentConfiguration:
+        MinimumHealthyPercent: 100
+        MaximumPercent: 200
+        DeploymentCircuitBreaker:
+          Enable: true
+          Rollback: true
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          Subnets:
+            - !ImportValue 'event-tracker-PrivateSubnetA'
+            - !ImportValue 'event-tracker-PrivateSubnetB'
+          SecurityGroups:
+            - !ImportValue 'event-tracker-ECSSecurityGroup'
+      LoadBalancers:
+        - ContainerName: !Sub '${ProjectName}-container'
+          ContainerPort: 5000
+          TargetGroupArn: !ImportValue 'event-tracker-TargetGroupArn'
+      HealthCheckGracePeriodSeconds: 60
+      Tags:
+        - Key: Project
+          Value: !Ref ProjectName
+
+  # ─── AUTO SCALING ──────────────────────────────────────────────────────────
+  AutoScalingTarget:
+    Type: AWS::ApplicationAutoScaling::ScalableTarget
+    DependsOn: ECSService
+    Properties:
+      MinCapacity: !Ref MinCount
+      MaxCapacity: !Ref MaxCount
+      ResourceId: !Sub 'service/${ProjectName}-cluster/${ProjectName}-service'
+      ScalableDimension: ecs:service:DesiredCount
+      ServiceNamespace: ecs
+      RoleARN: !Sub 'arn:aws:iam::${AccountId}:role/aws-service-role/ecs.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_ECSService'
+
+  CPUScalingPolicy:
+    Type: AWS::ApplicationAutoScaling::ScalingPolicy
+    Properties:
+      PolicyName: !Sub '${ProjectName}-cpu-scaling'
+      PolicyType: TargetTrackingScaling
+      ScalingTargetId: !Ref AutoScalingTarget
+      TargetTrackingScalingPolicyConfiguration:
+        TargetValue: 70.0
+        PredefinedMetricSpecification:
+          PredefinedMetricType: ECSServiceAverageCPUUtilization
+        ScaleInCooldown: 300
+        ScaleOutCooldown: 60
+
+  MemoryScalingPolicy:
+    Type: AWS::ApplicationAutoScaling::ScalingPolicy
+    Properties:
+      PolicyName: !Sub '${ProjectName}-memory-scaling'
+      PolicyType: TargetTrackingScaling
+      ScalingTargetId: !Ref AutoScalingTarget
+      TargetTrackingScalingPolicyConfiguration:
+        TargetValue: 80.0
+        PredefinedMetricSpecification:
+          PredefinedMetricType: ECSServiceAverageMemoryUtilization
+        ScaleInCooldown: 300
+        ScaleOutCooldown: 60
+
+Outputs:
+  ECSClusterName:
+    Value: !Ref ECSCluster
+    Export:
+      Name: !Sub '${ProjectName}-ECSClusterName'
+
+  ECSServiceName:
+    Value: !GetAtt ECSService.Name
+    Export:
+      Name: !Sub '${ProjectName}-ECSServiceName'
+
+  TaskDefinitionArn:
+    Value: !Ref TaskDefinition
+    Export:
+      Name: !Sub '${ProjectName}-TaskDefinitionArn'
