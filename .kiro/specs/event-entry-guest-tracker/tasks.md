@@ -515,20 +515,6 @@ Implement Flask endpoints for guest registration, batch registration, search, ca
   - Return matching guests with pagination
   - _Requirements: 8.1-8.5_
 
-- [ ] 48. Batch Guest Registration Endpoint
-  - Create POST /api/guests/batch endpoint
-  - Accept JSON: {guests: [{name, email, phone, ...}, ...], event_id}
-  - Enforce 100-guest maximum per batch
-  - Validate all guests before atomic batch insert
-  - Implement transaction with all-or-nothing semantics
-  - Log batch registration in audit trail (registrar_id, batch_id)
-  - Return JSON: {success: true, created: N, failed: M, results: [{guest_id, status}, ...]}
-  - _Requirements: 7.10_
-
-  - [ ]* 48.1 Write property test for batch registration atomicity
-    - **Property 14: Batch Registration Atomicity**
-    - **Validates: Requirement 7.10**
-
 - [ ] 49. Guest Update Endpoint
   - Create PUT /api/guests/{guest_id} endpoint
   - Accept JSON with updatable fields (name, email, company, profession, emergency_contact)
@@ -638,23 +624,6 @@ Implement Flask REST endpoints for check-in/check-out transaction processing wit
   - Display warning to volunteer: "Guest already checked in at HH:MM at Location. Check in again?"
   - _Requirements: 9.11, 22.1_
 
-- [ ] 57. Guest Current Status and Location Queries
-  - Create GET /api/guests/{guest_id}/status endpoint
-  - Return current guest status: {guest_id, current_status, current_location, last_check_in_time}
-  - Create GET /api/events/{event_id}/guests?current_status=present endpoint
-  - Return list of guests currently present with locations
-  - Create GET /api/events/{event_id}/guests?current_status=departed endpoint
-  - Return list of guests who have checked out
-  - _Requirements: 9.8, 10.7, 13.2_
-
-- [ ] 58. Session-Specific Check-In/Check-Out
-  - Modify check-in endpoint to support session_id parameter
-  - On first check-in to session: create Session_Attendance record (lazy initialization)
-  - Track session-specific attendance separately from event-level
-  - On check-out from session: update Session_Attendance with check_out_time
-  - Calculate session-specific duration
-  - Support guest checking into multiple sessions within same event
-  - _Requirements: 12.1-12.5_
 
 - [ ] 59. Volunteer Enforcement
   - Add check to both endpoints: require Volunteer or Master_User role
@@ -739,29 +708,6 @@ Implement Flask REST endpoints for real-time attendance metrics aggregation, cap
   - Ensure response time < 500ms (direct RDS queries, no caching)
   - _Requirements: 13.1-13.8_
 
-- [ ] 67. Capacity Monitoring and Alerts
-  - Implement GET /api/events/{event_id}/capacity endpoint
-  - Calculate percentage of capacity used (current_attendance / capacity)
-  - Return status: 'normal' (<80%), 'warning' (80-99%), 'critical' (≥100%)
-  - Display warning indicator at 80% of capacity
-  - Display alert at 100% of capacity
-  - Track capacity at event level and location level
-  - Return JSON: {capacity: C, current_count: N, percentage: X%, status: "normal"|"warning"|"critical"}
-  - _Requirements: 23.1-23.5_
-
-  - [ ]* 67.1 Write property test for capacity monitoring
-    - **Property 15: Capacity Monitoring Consistency**
-    - **Validates: Requirements 23.2-23.3**
-
-- [ ] 68. Capacity Override for Master User
-  - Implement POST /api/events/{event_id}/capacity-override endpoint
-  - Require Master_User session token
-  - Allow check-in to exceed capacity with override + note
-  - Record override action in audit log
-  - Display override warning in check-in confirmation
-  - Log override events for later review
-  - _Requirements: 23.4_
-
 - [ ] 69. React Dashboard Components
   - Create DashboardPage component displaying current metrics
   - Display: total registered, currently present, checked out, not checked in
@@ -785,7 +731,7 @@ Implement Flask REST endpoints for real-time attendance metrics aggregation, cap
 
 ### Objective
 
-Implement Flask endpoints for comprehensive attendance analytics, reporting, and data export in multiple formats (CSV, JSON, Excel, PDF).
+Implement Flask endpoints for comprehensive attendance analytics and reporting. (Data export was removed from scope.)
 
 ---
 
@@ -829,61 +775,6 @@ Implement Flask endpoints for comprehensive attendance analytics, reporting, and
   - Return JSON: {peak_time: timestamp, peak_count: N}
   - _Requirements: 14.2_
 
-- [ ] 76. Data Export to CSV Format
-  - Implement GET /api/events/{event_id}/export?format=csv endpoint
-  - Export guest data with proper comma separation
-  - Export check-in/check-out events with timestamps
-  - Export session attendance records
-  - Quote fields containing special characters
-  - Return CSV string or file stream with Content-Type: text/csv
-  - _Requirements: 15.3_
-
-- [ ] 77. Data Export to JSON Format
-  - Implement JSON export endpoint
-  - Export data with proper JSON structure (valid JSON)
-  - Support nested objects for related data
-  - Include metadata (export timestamp, event info)
-  - Return JSON file with Content-Type: application/json
-  - _Requirements: 15.4_
-
-- [ ] 78. Data Export to Excel Format
-  - Implement Excel export endpoint (requires openpyxl library)
-  - Create workbook with multiple worksheets (guests, sessions, check-in/check-out, summary)
-  - Format headers and apply styles
-  - Include summary statistics sheet
-  - Return Excel file (Buffer) with Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
-  - _Requirements: 15.5_
-
-- [ ] 79. Data Export to PDF Format
-  - Implement PDF export endpoint (requires reportlab or similar)
-  - Generate PDF with formatted report (title, summary, tables, charts)
-  - Include chart visualization (attendance over time, category breakdown)
-  - Format tables with headers and alternating row colors
-  - Return PDF file (Buffer) with Content-Type: application/pdf
-  - _Requirements: 15.6_
-
-- [ ] 80. Export Button and Endpoint
-  - Create unified export endpoint: GET /api/events/{event_id}/analytics/export?format=csv|json|excel|pdf
-  - Implement format selection
-  - Return file with appropriate content-type header
-  - Implement download link for user download
-  - Log export requests in audit trail
-  - _Requirements: 15.1-15.7_
-
-- [ ] 81. React Reports Component
-  - Create ReportsPage component accessible to Master_User and Volunteer
-  - Display report type options (attendance, by category, by session, hourly)
-  - Implement time range picker (date filters)
-  - Display generated report with tables/charts
-  - Implement export button for each format
-  - _Requirements: 14.1_
-
-- [ ] 82. Checkpoint - Analytics & Reporting Complete
-  - Generate sample reports with test data
-  - Verify all export formats produce valid files
-  - Test PDF generation with charts and tables
-  - Verify Excel workbook has all sheets and formatting
-  - Manually review CSV and JSON exports for correctness
 
 ---
 
@@ -1004,7 +895,6 @@ Implement React components for all features: authentication, guest management, c
 
 - [ ] 94. Guest Management Components
   - Create GuestRegistrationForm component (single guest registration)
-  - Create BatchGuestUpload component (CSV file upload for batch registration)
   - Create GuestSearchComponent (search by name, email, phone)
   - Create GuestListComponent (display guests with pagination)
   - Create GuestDetailComponent (view/edit single guest)
@@ -1037,8 +927,7 @@ Implement React components for all features: authentication, guest management, c
   - Create CategoryBreakdownChart component (visualization)
   - Create LocationBreakdownChart component (visualization)
   - Create HourlyAttendanceChart component (visualization)
-  - Create ExportButtonComponent (CSV, JSON, Excel, PDF)
-  - _Requirements: 14.1-14.7, 15.1-15.7_
+  - _Requirements: 14.1-14.7_
 
 - [ ] 99. Utility and Layout Components
   - Create Layout component (header, navigation, footer)
@@ -1105,7 +994,6 @@ Implement comprehensive test suites, performance optimization, CI/CD pipeline, a
   - Test category breakdown
   - Test session attendance statistics
   - Test peak attendance detection
-  - Test export format generation (CSV, JSON, Excel, PDF)
   - Target: 95%+ code coverage for analytics module
   - _Requirements: 14.0, 15.0_
 
@@ -1134,8 +1022,7 @@ Implement comprehensive test suites, performance optimization, CI/CD pipeline, a
   - Verify all properties pass successfully
 
 - [ ] 107. Performance Testing and Optimization
-  - Test 100,000+ concurrent guest registrations (batch mode)
-  - Test 500 simultaneous check-in/check-out operations
+  - Test 20 simultaneous check-in/check-out operations
   - Measure dashboard latency (target: <2 seconds initial, <5 seconds updates)
   - Measure query execution time (target: <500ms with cache)
   - Measure audit log query performance (1M+ records)

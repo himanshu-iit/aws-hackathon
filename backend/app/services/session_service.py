@@ -8,11 +8,21 @@ from app.models.auth import SessionToken
 from app.models.base import utcnow
 
 
+class ConcurrentSessionLimitExceeded(Exception):
+    """Raised when the max concurrent active sessions cap is reached."""
+
+
 class SessionManager:
     @staticmethod
     def _generate_token() -> str:
         """URL-safe cryptographically-random token."""
         return secrets.token_urlsafe(48)[:64]
+
+    @classmethod
+    def active_session_count(cls) -> int:
+        """Count currently valid, non-expired sessions."""
+        sessions = SessionToken.query.filter_by(is_valid=True).all()
+        return sum(1 for s in sessions if not s.is_expired())
 
     @classmethod
     def create_session(
@@ -22,12 +32,28 @@ class SessionManager:
         permissions: list[str] | None = None,
         ip_address: str | None = None,
         user_agent: str | None = None,
+        event_id: str | None = None,
     ) -> SessionToken:
-        """Create and persist a new session token."""
+        """Create and persist a new session token.
+
+        Enforces the concurrent-session cap. A user who already has an active
+        session does not count against the cap for an additional login (their
+        existing sessions remain), but a brand-new login that would exceed the
+        global cap is rejected.
+        """
+        # Opportunistically clear expired sessions, then check the cap.
+        cls.cleanup_expired()
+        cap = current_app.config.get("MAX_CONCURRENT_SESSIONS", 20)
+        if cls.active_session_count() >= cap:
+            raise ConcurrentSessionLimitExceeded(
+                f"Maximum of {cap} concurrent logins reached. Try again later."
+            )
+
         token = SessionToken(
             user_id=user_id,
             token=cls._generate_token(),
             user_type=user_type,
+            event_id=event_id,
             expires_at=utcnow() + current_app.config["SESSION_TTL"],
             ip_address=ip_address,
             user_agent=user_agent,

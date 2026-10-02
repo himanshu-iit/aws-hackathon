@@ -41,6 +41,7 @@ class SessionToken(BaseModel):
     user_id = db.Column(db.String(36), db.ForeignKey("users.id"), nullable=False, index=True)
     token = db.Column(db.String(64), nullable=False, unique=True, index=True)
     user_type = db.Column(db.String(20), nullable=False)
+    event_id = db.Column(db.String(2), nullable=True, index=True)
     expires_at = db.Column(db.DateTime, nullable=False, index=True)
     ip_address = db.Column(db.String(45), nullable=True)
     user_agent = db.Column(db.String(500), nullable=True)

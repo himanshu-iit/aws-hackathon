@@ -52,6 +52,18 @@ class Config:
     # ── Sessions ────────────────────────────────────────────────────────────────
     SESSION_TTL = timedelta(hours=int(os.environ.get("SESSION_TTL_HOURS", "8")))
 
+    # ── Auth bypass (DEMO ONLY) ───────────────────────────────────────────────
+    # When true: master setup, login, and volunteer registration skip OTP
+    # verification entirely, and volunteers are auto-approved. This disables a
+    # core security control and MUST be false in production.
+    AUTH_BYPASS_OTP = os.environ.get("AUTH_BYPASS_OTP", "true").lower() == "true"
+
+    # ── Capacity limits (configurable via ECS task env vars) ───────────────────
+    # Total users = masters + volunteers + guests, combined.
+    MAX_TOTAL_USERS = int(os.environ.get("MAX_TOTAL_USERS", "200"))
+    # Max simultaneously-active login sessions.
+    MAX_CONCURRENT_SESSIONS = int(os.environ.get("MAX_CONCURRENT_SESSIONS", "20"))
+
     # ── Logging ─────────────────────────────────────────────────────────────────
     LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO")
     CLOUDWATCH_LOG_GROUP = os.environ.get("CLOUDWATCH_LOG_GROUP", "/ecs/event-tracker-app")
@@ -91,6 +103,8 @@ class TestingConfig(Config):
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
     # Deterministic settings for tests
     OTP_RATE_LIMIT_PER_HOUR = 1000
+    # Default OTP flow in tests; bypass is exercised explicitly where needed.
+    AUTH_BYPASS_OTP = False
 
 
 _CONFIG_MAP = {

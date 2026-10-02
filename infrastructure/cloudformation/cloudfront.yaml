@@ -1,0 +1,127 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Event Tracker - CloudFront distribution for React SPA (S3 origin) with /api/* proxied to the ALB'
+
+Parameters:
+  ProjectName:
+    Type: String
+    Default: event-tracker
+  AccountId:
+    Type: String
+    Default: '100611700941'
+  FrontendBucketName:
+    Type: String
+    Default: event-tracker-frontend-100611700941
+  ALBDomainName:
+    Type: String
+    Default: event-tracker-alb-187512089.us-east-1.elb.amazonaws.com
+    Description: 'ALB DNS name (HTTP origin for /api/*)'
+
+Resources:
+
+  # ─── Origin Access Control (modern replacement for OAI) ────────────────────
+  OriginAccessControl:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Name: !Sub '${ProjectName}-oac'
+        OriginAccessControlOriginType: s3
+        SigningBehavior: always
+        SigningProtocol: sigv4
+
+  # ─── CloudFront Distribution ───────────────────────────────────────────────
+  Distribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Enabled: true
+        Comment: !Sub '${ProjectName} React SPA + API proxy'
+        DefaultRootObject: index.html
+        PriceClass: PriceClass_100
+        HttpVersion: http2
+
+        Origins:
+          # S3 static site origin (SPA assets)
+          - Id: s3-frontend
+            DomainName: !Sub '${FrontendBucketName}.s3.us-east-1.amazonaws.com'
+            S3OriginConfig:
+              OriginAccessIdentity: ''
+            OriginAccessControlId: !GetAtt OriginAccessControl.Id
+          # ALB origin (backend API, HTTP only)
+          - Id: alb-api
+            DomainName: !Ref ALBDomainName
+            CustomOriginConfig:
+              OriginProtocolPolicy: http-only
+              HTTPPort: 80
+              HTTPSPort: 443
+              OriginSSLProtocols:
+                - TLSv1.2
+
+        DefaultCacheBehavior:
+          TargetOriginId: s3-frontend
+          ViewerProtocolPolicy: redirect-to-https
+          Compress: true
+          AllowedMethods: [GET, HEAD, OPTIONS]
+          CachedMethods: [GET, HEAD]
+          # AWS managed CachingOptimized policy
+          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6
+
+        CacheBehaviors:
+          # Proxy API calls to the ALB, no caching, forward everything
+          - PathPattern: '/api/*'
+            TargetOriginId: alb-api
+            ViewerProtocolPolicy: redirect-to-https
+            AllowedMethods: [GET, HEAD, OPTIONS, PUT, POST, PATCH, DELETE]
+            CachedMethods: [GET, HEAD]
+            # AWS managed CachingDisabled policy
+            CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad
+            # AWS managed AllViewer origin request policy (forward all headers/query/cookies)
+            OriginRequestPolicyId: 216adef6-5c7f-47e4-b989-5492eafa07d3
+
+        # SPA routing: client-side routes return index.html
+        CustomErrorResponses:
+          - ErrorCode: 403
+            ResponseCode: 200
+            ResponsePagePath: /index.html
+            ErrorCachingMinTTL: 10
+          - ErrorCode: 404
+            ResponseCode: 200
+            ResponsePagePath: /index.html
+            ErrorCachingMinTTL: 10
+
+        ViewerCertificate:
+          CloudFrontDefaultCertificate: true
+
+      Tags:
+        - Key: Project
+          Value: !Ref ProjectName
+
+  # ─── S3 bucket policy allowing CloudFront (OAC) to read objects ────────────
+  FrontendBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref FrontendBucketName
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowCloudFrontOAC
+            Effect: Allow
+            Principal:
+              Service: cloudfront.amazonaws.com
+            Action: s3:GetObject
+            Resource: !Sub 'arn:aws:s3:::${FrontendBucketName}/*'
+            Condition:
+              StringEquals:
+                AWS:SourceArn: !Sub 'arn:aws:cloudfront::${AccountId}:distribution/${Distribution}'
+
+Outputs:
+  DistributionId:
+    Description: CloudFront distribution ID
+    Value: !Ref Distribution
+    Export:
+      Name: !Sub '${ProjectName}-DistributionId'
+
+  DistributionDomainName:
+    Description: CloudFront domain (the application URL)
+    Value: !GetAtt Distribution.DomainName
+    Export:
+      Name: !Sub '${ProjectName}-DistributionDomainName'

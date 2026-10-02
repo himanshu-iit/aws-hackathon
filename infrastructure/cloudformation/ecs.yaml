@@ -78,6 +78,14 @@ Resources:
               Value: !Sub '/ecs/${ProjectName}-app'
             - Name: AUTO_CREATE_TABLES
               Value: 'true'
+            - Name: RESET_SCHEMA
+              Value: 'false'
+            - Name: AUTH_BYPASS_OTP
+              Value: 'true'
+            - Name: MAX_TOTAL_USERS
+              Value: '200'
+            - Name: MAX_CONCURRENT_SESSIONS
+              Value: '20'
           Secrets:
             - Name: DATABASE_URL
               ValueFrom: !Sub 'arn:aws:secretsmanager:us-east-1:${AccountId}:secret:${ProjectName}/prod:DATABASE_URL::'
@@ -89,6 +97,12 @@ Resources:
               ValueFrom: !Sub 'arn:aws:secretsmanager:us-east-1:${AccountId}:secret:${ProjectName}/prod:SENDGRID_API_KEY::'
             - Name: TWILIO_API_KEY
               ValueFrom: !Sub 'arn:aws:secretsmanager:us-east-1:${AccountId}:secret:${ProjectName}/prod:TWILIO_API_KEY::'
+            - Name: TWILIO_ACCOUNT_SID
+              ValueFrom: !Sub 'arn:aws:secretsmanager:us-east-1:${AccountId}:secret:${ProjectName}/prod:TWILIO_ACCOUNT_SID::'
+            - Name: TWILIO_FROM_NUMBER
+              ValueFrom: !Sub 'arn:aws:secretsmanager:us-east-1:${AccountId}:secret:${ProjectName}/prod:TWILIO_FROM_NUMBER::'
+            - Name: SENDGRID_FROM_EMAIL
+              ValueFrom: !Sub 'arn:aws:secretsmanager:us-east-1:${AccountId}:secret:${ProjectName}/prod:SENDGRID_FROM_EMAIL::'
             - Name: CORS_ORIGINS
               ValueFrom: !Sub 'arn:aws:secretsmanager:us-east-1:${AccountId}:secret:${ProjectName}/prod:CORS_ORIGINS::'
           LogConfiguration:

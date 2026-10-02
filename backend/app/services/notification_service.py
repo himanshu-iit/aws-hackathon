@@ -16,6 +16,15 @@ _MAX_RETRIES = 3
 _BACKOFF_BASE_SECONDS = 0.5
 
 
+def _is_configured(key: str | None) -> bool:
+    """A key counts as configured only if present and not a placeholder."""
+    if not key:
+        return False
+    if key.startswith("REPLACE_WITH"):
+        return False
+    return True
+
+
 def _retry(fn, *args, **kwargs):
     """Call fn with exponential-backoff retries. Returns True on success."""
     for attempt in range(1, _MAX_RETRIES + 1):
@@ -60,7 +69,7 @@ class EmailService:
 
     @classmethod
     def send_notification_email(cls, to_email: str, subject: str, body: str) -> bool:
-        if not current_app.config.get("SENDGRID_API_KEY"):
+        if not _is_configured(current_app.config.get("SENDGRID_API_KEY")):
             logger.info("[DEV EMAIL] to=%s subject=%s body=%s", to_email, subject, body)
             return True
         return _retry(cls._send_via_sendgrid, to_email, subject, body)
@@ -68,13 +77,26 @@ class EmailService:
 
 class SMSService:
     @staticmethod
+    def _to_e164(number: str) -> str:
+        """Twilio requires E.164 (+<digits>). Our stored form is +CC-XXXXXXXXXX;
+        strip everything except digits and a leading +."""
+        if not number:
+            return number
+        digits = "".join(ch for ch in number if ch.isdigit())
+        return f"+{digits}"
+
+    @staticmethod
     def _send_via_twilio(to_number: str, body: str) -> None:
         cfg = current_app.config
         sid = cfg["TWILIO_ACCOUNT_SID"]
         resp = requests.post(
             f"https://api.twilio.com/2010-04-01/Accounts/{sid}/Messages.json",
             auth=(sid, cfg["TWILIO_API_KEY"]),
-            data={"To": to_number, "From": cfg["TWILIO_FROM_NUMBER"], "Body": body},
+            data={
+                "To": SMSService._to_e164(to_number),
+                "From": cfg["TWILIO_FROM_NUMBER"],
+                "Body": body,
+            },
             timeout=10,
         )
         resp.raise_for_status()
@@ -87,7 +109,7 @@ class SMSService:
 
     @classmethod
     def send_notification_sms(cls, to_number: str, body: str) -> bool:
-        if not current_app.config.get("TWILIO_API_KEY"):
+        if not _is_configured(current_app.config.get("TWILIO_API_KEY")):
             logger.info("[DEV SMS] to=%s body=%s", to_number, body)
             return True
         return _retry(cls._send_via_twilio, to_number, body)

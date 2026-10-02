@@ -27,6 +27,9 @@ class User(BaseModel):
     phone = db.Column(db.String(20), nullable=True, index=True)
     last_login = db.Column(db.DateTime, nullable=True)
 
+    # Event scope: the 2-digit event this user belongs to.
+    event_id = db.Column(db.String(2), nullable=True, index=True)
+
     # Volunteer-specific
     approval_status = db.Column(
         db.String(20), nullable=True, index=True

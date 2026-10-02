@@ -47,12 +47,18 @@ def create_app(config_name: str | None = None) -> Flask:
         # it only creates missing tables and never drops or alters existing ones.
         uri = app.config["SQLALCHEMY_DATABASE_URI"]
         auto_create = os.environ.get("AUTO_CREATE_TABLES", "false").lower() == "true"
+        reset_schema = os.environ.get("RESET_SCHEMA", "false").lower() == "true"
         if uri.startswith("sqlite") or auto_create:
             try:
+                if reset_schema and not uri.startswith("sqlite"):
+                    # One-time destructive reset to apply schema changes on a
+                    # demo DB with no migration pipeline. Drops ALL data.
+                    db.drop_all()
+                    app.logger.warning("RESET_SCHEMA: dropped all tables")
                 db.create_all()
                 app.logger.info("Database tables ensured (create_all)")
             except Exception:  # noqa: BLE001
-                app.logger.exception("create_all failed")
+                app.logger.exception("create_all/reset failed")
 
     # Blueprints
     from app.blueprints import register_blueprints
@@ -61,3 +67,21 @@ def create_app(config_name: str | None = None) -> Flask:
 
     app.logger.info("Event Tracker backend initialized", extra={"env": config_name})
     return app
+
+
+def _seed_demo_event(app) -> None:
+    """Ensure a default demo event exists so guests can be registered before
+    the event-management endpoints (a later phase) are available.
+
+    Guests have a foreign key to events; without a parent event, registration
+    fails on databases that enforce FKs (MySQL). Idempotent.
+    """
+    from app.models.guest import Event
+
+    demo_id = os.environ.get("DEMO_EVENT_ID", "demo-event")
+    if db.session.get(Event, demo_id) is not None:
+        return
+    event = Event(id=demo_id, name="Demo Event", description="Default event for testing")
+    db.session.add(event)
+    db.session.commit()
+    app.logger.info("Seeded demo event", extra={"event_id": demo_id})

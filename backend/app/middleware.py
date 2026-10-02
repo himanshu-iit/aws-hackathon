@@ -79,3 +79,10 @@ def register_middleware(app) -> None:
     def _server_error(e):
         logger.exception("Unhandled server error", extra={"request_id": getattr(g, "request_id", None)})
         return _error("INTERNAL_ERROR", "An internal error occurred", 500)
+
+    # Concurrent-session cap -> 429 Too Many Requests
+    from app.services.session_service import ConcurrentSessionLimitExceeded
+
+    @app.errorhandler(ConcurrentSessionLimitExceeded)
+    def _session_limit(e):
+        return _error("SESSION_LIMIT_REACHED", str(e), 429)
